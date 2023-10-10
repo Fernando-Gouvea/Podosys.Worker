@@ -1,6 +1,6 @@
 ﻿namespace Podosys.Worker.Domain.Models.Reports
 {
-    public class RegisteredPacients
+    public class RegisteredPacient
     {
         public DateTime Date { get; set; }
         public int RegisterAmounth { get; set; }

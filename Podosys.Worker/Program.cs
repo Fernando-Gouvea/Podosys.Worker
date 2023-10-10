@@ -1,6 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Podosys.Worker.Domain.Repositories;
 using Podosys.Worker.Domain.Services;
 using Podosys.Worker.Extensions;
+using Podosys.Worker.Persistence.Context;
 using Podosys.Worker.Persistence.Repositories;
 using Podosys.Worker.Workers;
 
@@ -9,6 +11,9 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     var timeZoneBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+
+    
+    builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
 
     builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
     builder.Services.AddTransient<IUpdateReport, UpdateReport>();
