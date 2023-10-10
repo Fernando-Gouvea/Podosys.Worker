@@ -17,11 +17,39 @@ namespace Podosys.Worker.Persistence.Repositories
             _podosysConnectionString = configuration.GetConnectionString("PodosysConnection") ?? "";
         }
 
-        public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime FirstDate, DateTime LastDate)
+        public async Task<IEnumerable<Transaction>> GetTransaction(DateTime FirstDate, DateTime LastDate)
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
-            var date = DateTime.Now.Date.AddDays(-1);
+            string sql = @"SELECT [Id] 
+                                 ,[Description]
+                                 ,[FlowType]
+                                 ,[PaymentType]
+                                 ,[Value]
+                                 ,[Date]
+                                 ,[CashFlowId]
+                                 ,[MedicalRecordId]
+                                 ,[OrderId]
+                                 ,[SaleOffId]
+                                 ,[TransactionTypeId]
+                                 ,[PaymentTypeId]
+                             FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
+                             Where [Date] >= '" + FirstDate.ToString("yyyy-MM-dd") + "'AND [Date] < '" + LastDate.ToString("yyyy-MM-dd") + "'";
+
+            return await db.QueryAsync<Transaction>(sql);
+        }
+
+        public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(IEnumerable<Guid> medicalRecordIds)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var medicalRecordId in medicalRecordIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[Id] ='" + medicalRecordId.ToString() + "'";
+            }
 
             string sql = @"SELECT [Id] 
                                  ,[PacientId]
@@ -32,11 +60,65 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[MedicalRecordDate]
                                  ,[Enabler] 
                              FROM [db_a7ba3c_podosysprd].[dbo].[MedicalRecord_tb] 
-                             Where [MedicalRecordDate] >= '" + date.ToString("yyyy-MM-dd") + "'AND [MedicalRecordDate] < '" + DateTime.Now.ToString("yyyy-MM-dd") + "'";
+                             Where " + ids;
 
-            var medicalRecords = await db.QueryAsync<MedicalRecord>(sql);
-            return medicalRecords;
+            return await db.QueryAsync<MedicalRecord>(sql);
         }
 
+        public async Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var pacientId in pacientIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[Id] ='" + pacientId.ToString() + "'";
+            }
+
+            string sql = @"SELECT [Id] 
+                                  ,[Name]
+                                  ,[Surgery]
+                                  ,[BirthDate]
+                                  ,[PrimaryPhone]
+                                  ,[SecondaryPhone]
+                                  ,[Allergies]
+                                  ,[AddressId]
+                                  ,[RegisterDate]
+                                  ,[Enabler]
+                                  ,[HowMeeted]
+                                  ,[Occupation]
+                                  ,[Sport]
+                                  ,[Standing]
+                                  ,[Medicine]
+                                  ,[Shoe]
+                                  ,[Observation]
+                              FROM [db_a7ba3c_podosysprd].[dbo].[Pacient_tb]
+                              Where " + ids;
+
+            return await db.QueryAsync<Pacient>(sql);
+        }
+
+        public async Task<IEnumerable<Procedure>> GetProcedure(IEnumerable<Guid> medicalRecordIds)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var medicalRecordId in medicalRecordIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[MedicalRecordId] ='" + medicalRecordId.ToString() + "'";
+            }
+
+            string sql = @"SELECT [Id] 
+                                 ,[ProcedureType]
+                                 ,[MedicalRecordId]
+                              FROM [db_a7ba3c_podosysprd].[dbo].[Procedure_tb]
+                              Where " + ids;
+
+            return await db.QueryAsync<Procedure>(sql);
+        }
     }
 }
