@@ -18,7 +18,7 @@ namespace Podosys.Worker.Domain.Services
             _profitRepository = profitRepository;
         }
 
-        public async void UpdateReportAsync()
+        public async Task UpdateReportAsync()
         {
             var firstdate = DateTime.Now.AddDays(-1);
             var lastdate = DateTime.Now;
@@ -33,7 +33,7 @@ namespace Podosys.Worker.Domain.Services
 
             var profit = CalculateProfit(transactions);
 
-            _profitRepository.AddProfitAsync(profit);
+            await _profitRepository.AddProfitAsync(profit);
         }
 
         private Profit CalculateProfit(IEnumerable<Models.Podosys.Transaction> transactions)

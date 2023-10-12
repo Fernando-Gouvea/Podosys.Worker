@@ -15,10 +15,11 @@ try
 
     builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
 
-    builder.Services.AddTransient<IProfitRepository, PodosysRepository>();
+    builder.Services.AddTransient<IProfitRepository, ProfitRepository>();
+    builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
     builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
-    builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "08 10 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+    builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "11 21 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
     var app = builder.Build();
 

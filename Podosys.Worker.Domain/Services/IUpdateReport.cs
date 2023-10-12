@@ -2,6 +2,6 @@
 {
     public interface IUpdateReport
     {
-        void UpdateReportAsync();
+        Task UpdateReportAsync();
     }
 }

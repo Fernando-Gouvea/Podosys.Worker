@@ -19,7 +19,7 @@ namespace Podosys.Worker.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async void AddProfitAsync(Profit profit)
+        public async Task AddProfitAsync(Profit profit)
         {
             var oldProfit = await _context.Profit
                             .Where(x => x.Date.Date == profit.Date.Date)

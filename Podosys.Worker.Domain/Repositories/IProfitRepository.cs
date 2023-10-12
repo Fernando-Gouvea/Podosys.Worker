@@ -5,7 +5,7 @@ namespace Podosys.Worker.Domain.Repositories
     public interface IProfitRepository
     {
         void CommitAsync();
-        void AddProfitAsync(Profit profit);
+        Task AddProfitAsync(Profit profit);
         Task<IEnumerable<Profit>> GetAll();
     }
 }

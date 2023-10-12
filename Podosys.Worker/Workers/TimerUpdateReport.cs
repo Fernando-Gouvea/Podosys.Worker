@@ -16,7 +16,7 @@ namespace Podosys.Worker.Workers
             try
             {
                var svc = scope.ServiceProvider.GetRequiredService<IUpdateReport>();
-                svc.UpdateReportAsync();
+                await svc.UpdateReportAsync();
             }
             catch (Exception ex)
             {
