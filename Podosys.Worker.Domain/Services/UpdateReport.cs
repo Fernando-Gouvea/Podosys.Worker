@@ -95,8 +95,8 @@ namespace Podosys.Worker.Domain.Services
             if (!procedure.Any())
                 return new ProcedurePerformed
                 {
-                    BandAidProcedure = 0,
-                    Procedure = 0,
+                    BandAidProcedureAmount = 0,
+                    ProcedureAmount = 0,
                     Date = date.Date,
                 };
 
@@ -105,8 +105,8 @@ namespace Podosys.Worker.Domain.Services
 
             return new ProcedurePerformed
             {
-                BandAidProcedure = bandAidAmount,
-                Procedure = procedureAmount,
+                BandAidProcedureAmount = bandAidAmount,
+                ProcedureAmount = procedureAmount,
                 Date = date.Date,
             };
         }
