@@ -2,6 +2,7 @@
 {
     public class AgeGroup
     {
+        public int Id { get; set; }
         public DateTime Date { get; set; }
         public int Baby { get; set; }
         public int Child { get; set; }

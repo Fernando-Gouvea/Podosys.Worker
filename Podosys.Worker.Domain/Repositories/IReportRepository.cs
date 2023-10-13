@@ -2,10 +2,11 @@
 
 namespace Podosys.Worker.Domain.Repositories
 {
-    public interface IProfitRepository
+    public interface IReportRepository
     {
-        void CommitAsync();
         Task AddProfitAsync(Profit profit);
         Task<IEnumerable<Profit>> GetAll();
+        Task AddProcedurePerformedAsync(ProcedurePerformed procedurePerformed);
+        Task AddProcedureReportAsync(IEnumerable<Procedure> procedure);
     }
 }

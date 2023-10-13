@@ -24,6 +24,12 @@ namespace Podosys.Worker.Persistence.Migrations
 
             modelBuilder.Entity("Podosys.Worker.Domain.Models.Reports.AgeGroup", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("Adult")
                         .HasColumnType("int");
 
@@ -45,11 +51,19 @@ namespace Podosys.Worker.Persistence.Migrations
                     b.Property<int>("Young")
                         .HasColumnType("int");
 
+                    b.HasKey("Id");
+
                     b.ToTable("AgeGroups");
                 });
 
             modelBuilder.Entity("Podosys.Worker.Domain.Models.Reports.Procedure", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("Amounth")
                         .HasColumnType("int");
 
@@ -62,11 +76,19 @@ namespace Podosys.Worker.Persistence.Migrations
                     b.Property<decimal>("Value")
                         .HasColumnType("Decimal(7,2)");
 
+                    b.HasKey("Id");
+
                     b.ToTable("Procedures");
                 });
 
             modelBuilder.Entity("Podosys.Worker.Domain.Models.Reports.ProcedurePerformed", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("BandAidProcedure")
                         .HasColumnType("int");
 
@@ -76,11 +98,19 @@ namespace Podosys.Worker.Persistence.Migrations
                     b.Property<int>("Procedure")
                         .HasColumnType("int");
 
+                    b.HasKey("Id");
+
                     b.ToTable("ProcedurePerformed");
                 });
 
             modelBuilder.Entity("Podosys.Worker.Domain.Models.Reports.Profit", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<decimal>("CashValue")
                         .HasColumnType("Decimal(7,2)");
 
@@ -90,22 +120,27 @@ namespace Podosys.Worker.Persistence.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Total")
-                        .HasColumnType("Decimal(7,2)");
-
                     b.Property<decimal>("TotalValue")
                         .HasColumnType("Decimal(7,2)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Profit");
                 });
 
             modelBuilder.Entity("Podosys.Worker.Domain.Models.Reports.ProfitProfessional", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Procedure")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ProcedureAmount")
+                        .HasColumnType("int");
 
                     b.Property<string>("Professional")
                         .HasColumnType("nvarchar(max)");
@@ -113,16 +148,26 @@ namespace Podosys.Worker.Persistence.Migrations
                     b.Property<decimal>("Value")
                         .HasColumnType("Decimal(7,2)");
 
+                    b.HasKey("Id");
+
                     b.ToTable("ProfitProfessional");
                 });
 
             modelBuilder.Entity("Podosys.Worker.Domain.Models.Reports.RegisteredPacient", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RegisterAmounth")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.ToTable("RegisteredPacients");
                 });

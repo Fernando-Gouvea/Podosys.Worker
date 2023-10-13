@@ -61,8 +61,17 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[Enabler] 
                              FROM [db_a7ba3c_podosysprd].[dbo].[MedicalRecord_tb] 
                              Where " + ids;
-
+            try
+            {
             return await db.QueryAsync<MedicalRecord>(sql);
+
+            }
+            catch (Exception ex)
+            {
+
+
+            }
+            return null; 
         }
 
         public async Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds)
