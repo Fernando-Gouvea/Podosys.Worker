@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Podosys.Worker.Domain.Enums;
+﻿using Podosys.Worker.Domain.Enums;
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Models.Reports;
 using Podosys.Worker.Domain.Repositories;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Podosys.Worker.Domain.Services
 {
@@ -22,38 +19,45 @@ namespace Podosys.Worker.Domain.Services
 
         public async Task UpdateReportAsync()
         {
-            // var firstdate = DateTime.Parse("01-10-2023");
+            var firstdate = DateTime.Now.AddDays(-1);
             var lastdate = DateTime.Now;
-            var secunddate = DateTime.Now;
 
-            for (var firstdate = DateTime.Parse("01-01-2023"); firstdate.Date < secunddate.Date; firstdate = firstdate.AddDays(1))
-            {
+            var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
-                lastdate = firstdate.AddDays(1);
+            if (!transactions.Any() || !transactions.Any(x => x.MedicalRecordId != null))
+                return;
 
-                var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
+            var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
 
-                if (!transactions.Any() || !transactions.Any(x=>x.MedicalRecordId != null))
-                    continue;
+            var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
 
-                var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
+            var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
 
-                var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
+            var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
 
-                var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
+            var profit = CalculateProfit(transactions);
 
-                var profit = CalculateProfit(transactions);
+            await _reportRepositoty.AddProfitAsync(profit);
 
-                await _reportRepositoty.AddProfitAsync(profit);
+            var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
 
-                var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
+            await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
 
-                await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
+            var procedureReport = CalculateProcedure(procedures, transactions);
 
-                var procedureReport = CalculateProcedure(procedures, transactions);
+            await _reportRepositoty.AddProcedureReportAsync(procedureReport);
 
-                await _reportRepositoty.AddProcedureReportAsync(procedureReport);
-            }
+            var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
+
+            await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
+
+            var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
+
+            await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
+
+            var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+
+            await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)
@@ -73,22 +77,34 @@ namespace Podosys.Worker.Domain.Services
             };
         }
 
-        //private ProfitProfessional CalculateProfitProfessional(IEnumerable<Transaction> transactions)
-        //{
-        //    var cashValue = transactions.Where(x => x.PaymentTypeId == (int)PaymentTypeEnum.Dinheiro &&
-        //                                      (x.MedicalRecordId != null || x.OrderId != null || x.SaleOffId != null)).Sum(x => x.Value);
+        private RegisteredPacient CalculateRegisteredPacient(IEnumerable<Pacient> pacients, DateTime date)
+        {
+            return new RegisteredPacient
+            {
+                Date = date.Date,
+                RegisterAmounth = pacients.Where(x => x.RegisterDate.Date == date).Count()
+            };
+        }
 
-        //    var currentAccountValue = transactions.Where(x => x.PaymentTypeId != (int)PaymentTypeEnum.Dinheiro &&
-        //                                                (x.MedicalRecordId != null || x.OrderId != null || x.SaleOffId != null)).Sum(x => x.Value);
+        private AgeGroup CalculateAgeGroup(IEnumerable<Pacient> pacients, IEnumerable<Models.Podosys.Procedure> procedures, IEnumerable<MedicalRecord> medicalRecords, DateTime date)
+        {
+            var procedureBandaid = MedialRecordProcedureBandaid(procedures);
 
-        //    return new ProfitProfessional
-        //    {
-        //        CashValue = cashValue,
-        //        CurrentAccountValue = currentAccountValue,
-        //        Date = transactions.FirstOrDefault().Date.Date,
-        //        TotalValue = cashValue + currentAccountValue
-        //    };
-        //}
+            var pacientIds = medicalRecords.Where(x => procedureBandaid.Item1.Contains(x.Id)).Select(x => x.PacientId);
+
+            var listPacients = pacients.Where(x => pacientIds.Contains(x.Id));
+
+            return new AgeGroup
+            {
+                Date = date.Date,
+                Baby = listPacients.Where(x => x.Age >= 0 && x.Age < 2).Count(),
+                Child = listPacients.Where(x => x.Age >= 2 && x.Age < 12).Count(),
+                Teenager = listPacients.Where(x => x.Age >= 12 && x.Age < 18).Count(),
+                Young = listPacients.Where(x => x.Age >= 18 && x.Age < 30).Count(),
+                Adult = listPacients.Where(x => x.Age >= 30 && x.Age < 60).Count(),
+                Elderly = listPacients.Where(x => x.Age >= 60 && x.Age < 150).Count()
+            };
+        }
 
         private ProcedurePerformed CalculateProcedurePerformed(IEnumerable<Models.Podosys.Procedure> procedure, DateTime date)
         {
@@ -100,13 +116,13 @@ namespace Podosys.Worker.Domain.Services
                     Date = date.Date,
                 };
 
-            var bandAidAmount = procedure.Where(x => x.ProcedureType != null && x.ProcedureType.Contains(ProcedureEnum.Curativo.ToString())).Count();
-            var procedureAmount = procedure.Where(x => x.ProcedureType != null && !x.ProcedureType.Contains(ProcedureEnum.Curativo.ToString())).Count();
+            var procedureBandaid = MedialRecordProcedureBandaid(procedure);
 
             return new ProcedurePerformed
             {
-                BandAidProcedureAmount = bandAidAmount,
-                ProcedureAmount = procedureAmount,
+                ProcedureAmount = procedureBandaid.Item1.Count(),
+                BandAidProcedureAmount = procedureBandaid.Item2.Count(),
+                TotalAmount = procedureBandaid.Item1.Count() + procedureBandaid.Item2.Count(),
                 Date = date.Date,
             };
         }
@@ -139,7 +155,7 @@ namespace Podosys.Worker.Domain.Services
                 var report = new Models.Reports.Procedure
                 {
                     Date = transactions.FirstOrDefault().Date.Date,
-                    Amounth = 0,
+                    Amounth = 1,
                     ProcedureName = "Prontuarios Não Fechados",
                     Value = 0
                 };
@@ -148,6 +164,39 @@ namespace Podosys.Worker.Domain.Services
             }
 
             return response;
+        }
+
+        private IEnumerable<ProfitProfessional> CalculateProfitProfissional(IEnumerable<Professional> professionals, IEnumerable<Models.Podosys.Procedure> procedures, IEnumerable<MedicalRecord> medicalRecords, IEnumerable<Transaction> transactions)
+        {
+            var profit = new List<ProfitProfessional>();
+
+            var medicalRecordBandaid = MedialRecordProcedureBandaid(procedures);
+
+            foreach (var professional in professionals)
+            {
+                var medicalRecord = medicalRecords.Where(x => x.UserId == professional.Id);
+
+                var transaction = transactions.Where(t => medicalRecord.Any(x => x.Id == t.MedicalRecordId));
+
+                profit.Add(new ProfitProfessional
+                {
+                    Date = medicalRecord.FirstOrDefault().MedicalRecordDate.Date,
+                    Professional = professional.Name,
+                    Value = transaction.Sum(x => x.Value),
+                    ProcedureAmount = medicalRecord.Where(x => medicalRecordBandaid.Item1.Contains(x.Id)).Count(),
+                    BandaidAmount = medicalRecord.Where(x => medicalRecordBandaid.Item2.Contains(x.Id)).Count()
+                });
+            }
+
+            return profit;
+        }
+
+        private Tuple<IEnumerable<Guid>, IEnumerable<Guid>> MedialRecordProcedureBandaid(IEnumerable<Models.Podosys.Procedure> procedures)
+        {
+            var procedure = procedures.Where(x => x.ProcedureType != null && !x.ProcedureType.Contains(ProcedureEnum.Curativo.ToString())).Select(x => x.MedicalRecordId);
+            var bandaid = procedures.Where(x => x.ProcedureType != null && x.ProcedureType.Contains(ProcedureEnum.Curativo.ToString())).Select(x => x.MedicalRecordId);
+
+            return new Tuple<IEnumerable<Guid>, IEnumerable<Guid>>(procedure, bandaid);
         }
 
     }

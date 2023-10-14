@@ -8,5 +8,8 @@ namespace Podosys.Worker.Domain.Repositories
         Task<IEnumerable<Profit>> GetAll();
         Task AddProcedurePerformedAsync(ProcedurePerformed procedurePerformed);
         Task AddProcedureReportAsync(IEnumerable<Procedure> procedure);
+        Task AddRegisterPacientReportAsync(RegisteredPacient registeredPacient);
+        Task AddAgeGroupReportAsync(AgeGroup ageGroup);
+        Task AddProfitProfessionalReportAsync(IEnumerable<ProfitProfessional> profit);
     }
 }

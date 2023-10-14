@@ -8,7 +8,12 @@
 
         public DateTime BirthDate { get; set; }
 
-        public int Age { get; set; }
+        private int _age;
+
+        public int Age
+        {
+            get { return DateTime.Now.Year - BirthDate.Year; }
+        }
 
         public string? PrimaryPhone { get; set; }
 

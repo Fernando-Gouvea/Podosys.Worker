@@ -63,7 +63,7 @@ namespace Podosys.Worker.Persistence.Repositories
                              Where " + ids;
             try
             {
-            return await db.QueryAsync<MedicalRecord>(sql);
+                return await db.QueryAsync<MedicalRecord>(sql);
 
             }
             catch (Exception ex)
@@ -71,7 +71,7 @@ namespace Podosys.Worker.Persistence.Repositories
 
 
             }
-            return null; 
+            return null;
         }
 
         public async Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds)
@@ -128,6 +128,26 @@ namespace Podosys.Worker.Persistence.Repositories
                               Where " + ids;
 
             return await db.QueryAsync<Procedure>(sql);
+        }
+
+        public async Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var professionalId in professionalIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[Id] ='" + professionalId.ToString() + "'";
+            }
+
+            string sql = @"SELECT [Id] 
+                                 ,[Name]
+                              FROM [db_a7ba3c_podosysprd].[dbo].[User_tb]
+                              Where " + ids;
+
+            return await db.QueryAsync<Professional>(sql);
         }
     }
 }

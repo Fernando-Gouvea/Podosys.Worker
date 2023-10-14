@@ -59,5 +59,47 @@ namespace Podosys.Worker.Persistence.Repositories
 
             _context.SaveChanges();
         }
+
+        public async Task AddRegisterPacientReportAsync(RegisteredPacient registeredPacient)
+        {
+            var oldReports = await _context.RegisteredPacients
+                            .Where(x => x.Date.Date == registeredPacient.Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.RegisteredPacients.RemoveRange(oldReports);
+
+            await _context.RegisteredPacients.AddAsync(registeredPacient);
+
+            _context.SaveChanges();
+        }
+
+        public async Task AddAgeGroupReportAsync(AgeGroup ageGroup)
+        {
+            var oldReports = await _context.AgeGroups
+                            .Where(x => x.Date.Date == ageGroup.Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.AgeGroups.RemoveRange(oldReports);
+
+            await _context.AgeGroups.AddAsync(ageGroup);
+
+            _context.SaveChanges();
+        }
+
+        public async Task AddProfitProfessionalReportAsync(IEnumerable<ProfitProfessional> profit)
+        {
+            var oldReports = await _context.ProfitProfessional
+                            .Where(x => x.Date.Date == profit.FirstOrDefault().Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.ProfitProfessional.RemoveRange(oldReports);
+
+            await _context.ProfitProfessional.AddRangeAsync(profit);
+
+            _context.SaveChanges();
+        }
     }
 }

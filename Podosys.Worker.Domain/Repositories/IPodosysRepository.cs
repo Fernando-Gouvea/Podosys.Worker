@@ -8,5 +8,6 @@ namespace Podosys.Worker.Domain.Repositories
         Task<IEnumerable<MedicalRecord>> GetMedicalRecord(IEnumerable<Guid> medicalRecordIds);
         Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds);
         Task<IEnumerable<Procedure>> GetProcedure(IEnumerable<Guid> medicalRecordIds);
+        Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds);
     }
 }
