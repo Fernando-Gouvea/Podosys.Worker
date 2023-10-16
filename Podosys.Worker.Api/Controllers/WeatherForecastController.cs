@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Podosys.Worker.Domain.Services;
 
 namespace Podosys.Worker.Api.Controllers
 {
@@ -11,16 +12,18 @@ namespace Podosys.Worker.Api.Controllers
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IUpdateReport _updateReport;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(IUpdateReport updateReport)
         {
-            _logger = logger;
+            _updateReport = updateReport;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task<IEnumerable<WeatherForecast>> Get()
         {
+            await _updateReport.UpdateReportAsync();
+
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now,
