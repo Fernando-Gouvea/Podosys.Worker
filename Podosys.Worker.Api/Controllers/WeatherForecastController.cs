@@ -28,6 +28,8 @@ namespace Podosys.Worker.Api.Controllers
 
                 while ((line = stream.ReadLine()) != null)
                     file += line;
+
+                file += $"//hora servidor: {DateTime.Now}";
             }
             catch (Exception ex)
             {
