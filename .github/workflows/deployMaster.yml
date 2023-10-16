@@ -22,7 +22,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Publish
-      run: dotnet publish Podosys.Worker.Api/Podosys.Worker.Api.csproj -c Release /p:EnvironmentName=Production --output ./publish 
+      run: dotnet publish Podosys.Worker/Podosys.Worker.csproj -c Release /p:EnvironmentName=Production --output ./publish 
   
     - name: Deploy to PRD
       uses: jahbenjah/SmarterASP.NET-web-deploy@1.0.0.alpha.8
