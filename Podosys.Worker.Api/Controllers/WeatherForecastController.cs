@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Podosys.Worker.Domain.Services;
 
 namespace Podosys.Worker.Api.Controllers
@@ -7,11 +8,6 @@ namespace Podosys.Worker.Api.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
-
         private readonly IUpdateReport _updateReport;
 
         public WeatherForecastController(IUpdateReport updateReport)
@@ -20,25 +16,21 @@ namespace Podosys.Worker.Api.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public async Task<IEnumerable<WeatherForecast>> Get()
+        public async Task<string> Get()
         {
+            var file = "";
+
             try
             {
-
-            await _updateReport.UpdateReportAsync();
+                //await _updateReport.UpdateReportAsync();
+                file = JsonConvert.DeserializeObject<string>(new StreamReader("cronjob-status-info-TimerUpdateReport.txt").ReadToEnd());
             }
             catch (Exception ex)
             {
-
+                return ex.Message;
             }
 
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now,
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return file;
         }
     }
 }
