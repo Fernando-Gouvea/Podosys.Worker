@@ -18,7 +18,7 @@ var timeZoneBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Sta
 builder.Services.AddTransient<IReportRepository, ReportRepository>();
 builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
 builder.Services.AddTransient<IUpdateReport, UpdateReport>();
-builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "00 11 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "00 14 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
 
 builder.Services.AddControllers();
