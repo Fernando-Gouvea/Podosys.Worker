@@ -20,8 +20,8 @@ namespace Podosys.Worker.Domain.Services
 
         public async Task UpdateReportAsync()
         {
-            var firstdate = DateTime.Now.AddDays(-2);
-            var lastdate = DateTime.Now.AddDays(-1);
+            var firstdate = DateTime.Now.AddDays(-1);
+            var lastdate = DateTime.Now;
 
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
