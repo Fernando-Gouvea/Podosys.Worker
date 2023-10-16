@@ -22,7 +22,15 @@ namespace Podosys.Worker.Api.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public async Task<IEnumerable<WeatherForecast>> Get()
         {
+            try
+            {
+
             await _updateReport.UpdateReportAsync();
+            }
+            catch (Exception ex)
+            {
+
+            }
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

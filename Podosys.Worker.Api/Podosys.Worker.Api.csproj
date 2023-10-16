@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Podosys.Worker.Domain\Podosys.Worker.Domain.csproj" />
+    <ProjectReference Include="..\Podosys.Worker.Persistence\Podosys.Worker.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

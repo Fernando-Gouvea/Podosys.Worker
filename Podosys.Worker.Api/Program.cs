@@ -1,6 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using Podosys.Worker.Domain.Repositories;
+using Podosys.Worker.Domain.Services;
+using Podosys.Worker.Persistence.Context;
+using Podosys.Worker.Persistence.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
+
+builder.Services.AddTransient<IReportRepository, ReportRepository>();
+builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
+builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
