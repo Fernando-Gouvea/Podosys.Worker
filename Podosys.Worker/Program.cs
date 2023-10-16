@@ -1,10 +1,11 @@
+using FluentScheduler;
 using Microsoft.EntityFrameworkCore;
 using Podosys.Worker.Domain.Repositories;
 using Podosys.Worker.Domain.Services;
 using Podosys.Worker.Extensions;
 using Podosys.Worker.Persistence.Context;
 using Podosys.Worker.Persistence.Repositories;
-using Podosys.Worker.Workers;
+using static Podosys.Worker.Workers.CronJobService;
 
 try
 {
@@ -18,9 +19,11 @@ try
     builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
     builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
-    builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "15 07 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+    // builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "15 07 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
     var app = builder.Build();
+
+    JobManager.Initialize(new JobRegister());
 
     app.Run();
 }

@@ -1,4 +1,6 @@
-﻿namespace Podosys.Worker.Domain.Services
+﻿using FluentScheduler;
+
+namespace Podosys.Worker.Domain.Services
 {
     public interface IUpdateReport
     {

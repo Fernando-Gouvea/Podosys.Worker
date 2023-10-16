@@ -1,11 +1,12 @@
-﻿using Podosys.Worker.Domain.Enums;
+﻿using FluentScheduler;
+using Podosys.Worker.Domain.Enums;
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Models.Reports;
 using Podosys.Worker.Domain.Repositories;
 
 namespace Podosys.Worker.Domain.Services
 {
-    public class UpdateReport : IUpdateReport
+    public class UpdateReport : IUpdateReport, IJob
     {
         private readonly IPodosysRepository _podosysRepository;
         private readonly IReportRepository _reportRepositoty;
@@ -19,8 +20,8 @@ namespace Podosys.Worker.Domain.Services
 
         public async Task UpdateReportAsync()
         {
-            var firstdate = DateTime.Now.AddDays(-1);
-            var lastdate = DateTime.Now;
+            var firstdate = DateTime.Now.AddDays(-2);
+            var lastdate = DateTime.Now.AddDays(-1);
 
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
@@ -57,7 +58,7 @@ namespace Podosys.Worker.Domain.Services
 
             var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
 
-            await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now});
+            await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now });
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)
@@ -199,5 +200,10 @@ namespace Podosys.Worker.Domain.Services
             return new Tuple<IEnumerable<Guid>, IEnumerable<Guid>>(procedure, bandaid);
         }
 
+
+        public void Execute()
+        {
+            UpdateReportAsync();
+        }
     }
 }
