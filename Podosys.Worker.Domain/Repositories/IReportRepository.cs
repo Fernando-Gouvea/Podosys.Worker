@@ -11,5 +11,6 @@ namespace Podosys.Worker.Domain.Repositories
         Task AddRegisterPacientReportAsync(RegisteredPacient registeredPacient);
         Task AddAgeGroupReportAsync(AgeGroup ageGroup);
         Task AddProfitProfessionalReportAsync(IEnumerable<ProfitProfessional> profit);
+        Task AddUpdateHistoryReportAsync(UpdateHistory updateHistory);
     }
 }

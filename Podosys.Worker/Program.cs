@@ -18,7 +18,7 @@ try
     builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
     builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
-    builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "00 05 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+    builder.Services.AddCronJob<TimerUpdateReport>(c => { c.CronExpression = "25 22 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
     var app = builder.Build();
 
