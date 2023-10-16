@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Podosys.Worker.Domain.Services;
 
 namespace Podosys.Worker.Api.Controllers
@@ -23,7 +22,12 @@ namespace Podosys.Worker.Api.Controllers
             try
             {
                 //await _updateReport.UpdateReportAsync();
-                file = JsonConvert.DeserializeObject<string>(new StreamReader("cronjob-status-info-TimerUpdateReport.txt").ReadToEnd());
+                var stream = new StreamReader("cronjob-status-info-TimerUpdateReport.txt");
+
+                string? line;
+
+                while ((line = stream.ReadLine()) != null)
+                    file += line;
             }
             catch (Exception ex)
             {
