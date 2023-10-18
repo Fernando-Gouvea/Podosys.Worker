@@ -1,9 +1,7 @@
-﻿using FluentScheduler;
-
-namespace Podosys.Worker.Domain.Services
+﻿namespace Podosys.Worker.Domain.Services
 {
     public interface IUpdateReport
     {
-        Task UpdateReportAsync();
+        Task UpdateReportAsync(DateTime firstdate, DateTime lastdate);
     }
 }

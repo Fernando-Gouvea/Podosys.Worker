@@ -3,11 +3,11 @@ using Podosys.Worker.Domain.Services;
 
 namespace Podosys.Worker.Api.Workers
 {
-    public class TimerUpdateReport : CronJobExtensions
+    public class TimerUpdateReportLastDay : CronJobExtensions
     {
 
-        public TimerUpdateReport(IScheduleConfig<TimerUpdateReport> config, IServiceProvider serviceProvider)
-            : base(config.CronExpression, config.TimeZoneInfo, serviceProvider, nameof(TimerUpdateReport))
+        public TimerUpdateReportLastDay(IScheduleConfig<TimerUpdateReportLastDay> config, IServiceProvider serviceProvider)
+            : base(config.CronExpression, config.TimeZoneInfo, serviceProvider, nameof(TimerUpdateReportLastDay))
         {
 
         }
@@ -16,11 +16,11 @@ namespace Podosys.Worker.Api.Workers
             try
             {
                 var svc = scope.ServiceProvider.GetRequiredService<IUpdateReport>();
-                await svc.UpdateReportAsync();
+                await svc.UpdateReportAsync(DateTime.Now.Date.AddDays(-1), DateTime.Now.Date);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message, $"Erro em {nameof(TimerUpdateReport)}");
+                Console.WriteLine(ex.Message, $"Erro em {nameof(TimerUpdateReportLastDay)}");
             }
 
             return Task.CompletedTask;

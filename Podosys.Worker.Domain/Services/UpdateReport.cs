@@ -6,7 +6,7 @@ using Podosys.Worker.Domain.Repositories;
 
 namespace Podosys.Worker.Domain.Services
 {
-    public class UpdateReport : IUpdateReport, IJob
+    public class UpdateReport : IUpdateReport
     {
         private readonly IPodosysRepository _podosysRepository;
         private readonly IReportRepository _reportRepositoty;
@@ -18,11 +18,8 @@ namespace Podosys.Worker.Domain.Services
             _reportRepositoty = reportRepositoty;
         }
 
-        public async Task UpdateReportAsync()
+        public async Task UpdateReportAsync(DateTime firstdate, DateTime lastdate)
         {
-            var firstdate = DateTime.Now.AddDays(-1);
-            var lastdate = DateTime.Now;
-
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
             if (!transactions.Any() || !transactions.Any(x => x.MedicalRecordId != null))
@@ -198,12 +195,6 @@ namespace Podosys.Worker.Domain.Services
             var bandaid = procedures.Where(x => x.ProcedureType != null && x.ProcedureType.Contains(ProcedureEnum.Curativo.ToString())).Select(x => x.MedicalRecordId);
 
             return new Tuple<IEnumerable<Guid>, IEnumerable<Guid>>(procedure, bandaid);
-        }
-
-
-        public void Execute()
-        {
-            UpdateReportAsync();
         }
     }
 }

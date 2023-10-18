@@ -22,14 +22,21 @@ namespace Podosys.Worker.Api.Controllers
             try
             {
                 //await _updateReport.UpdateReportAsync();
-                var stream = new StreamReader("cronjob-status-info-TimerUpdateReport.txt");
+                var stream = new StreamReader("cronjob-status-info-TimerUpdateReportCurrentDay.txt");
 
                 string? line;
 
                 while ((line = stream.ReadLine()) != null)
                     file += line;
 
-                file += $"//hora servidor: {DateTime.Now}";
+                file += $"//TimerUpdateReportCurrentDay//--//";
+
+                stream = new StreamReader("cronjob-status-info-TimerUpdateReportLastDay.txt");
+
+                while ((line = stream.ReadLine()) != null)
+                    file += line;
+
+                file += $"//TimerUpdateReportCurrentDay//hora servidor: {DateTime.Now}";
             }
             catch (Exception ex)
             {
