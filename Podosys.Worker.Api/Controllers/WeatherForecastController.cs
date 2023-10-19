@@ -36,7 +36,7 @@ namespace Podosys.Worker.Api.Controllers
                 while ((line = stream.ReadLine()) != null)
                     file += line;
 
-                file += $"//TimerUpdateReportCurrentDay//hora servidor: {DateTime.Now}";
+                file += $"//TimerUpdateReportCurrentDay//hora servidor(BR): {DateTime.Now.AddHours(4)}";
             }
             catch (Exception ex)
             {
