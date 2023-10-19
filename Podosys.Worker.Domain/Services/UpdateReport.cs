@@ -55,7 +55,7 @@ namespace Podosys.Worker.Domain.Services
 
             var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
 
-            await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now });
+            await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now.AddHours(4) });
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)
