@@ -18,8 +18,8 @@ builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
 builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
 builder.Services.AddCronJob<TimerUpdateReportLastDay>(c => { c.CronExpression = "0 7,9,11 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
-
-builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "0 12,15,19,22 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "0 12,14,16,18,20,22 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+builder.Services.AddCronJob<TimerNoHibernate>(c => { c.CronExpression = "*/10 * * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
