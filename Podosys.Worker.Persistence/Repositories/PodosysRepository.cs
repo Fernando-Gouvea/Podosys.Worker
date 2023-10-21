@@ -96,7 +96,7 @@ namespace Podosys.Worker.Persistence.Repositories
                                   ,[AddressId]
                                   ,[RegisterDate]
                                   ,[Enabler]
-                                  ,[HowMeeted]
+                                  ,[CommunicationChannelId]
                                   ,[Occupation]
                                   ,[Sport]
                                   ,[Standing]
@@ -105,6 +105,35 @@ namespace Podosys.Worker.Persistence.Repositories
                                   ,[Observation]
                               FROM [db_a7ba3c_podosysprd].[dbo].[Pacient_tb]
                               Where " + ids;
+
+            return await db.QueryAsync<Pacient>(sql);
+        }
+
+        public async Task<IEnumerable<Pacient>> GetPacientByDate(DateTime date)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var lastdate = date.AddDays(1);
+
+            string sql = @"SELECT [Id] 
+                                  ,[Name]
+                                  ,[Surgery]
+                                  ,[BirthDate]
+                                  ,[PrimaryPhone]
+                                  ,[SecondaryPhone]
+                                  ,[Allergies]
+                                  ,[AddressId]
+                                  ,[RegisterDate]
+                                  ,[Enabler]
+                                  ,[CommunicationChannelId]
+                                  ,[Occupation]
+                                  ,[Sport]
+                                  ,[Standing]
+                                  ,[Medicine]
+                                  ,[Shoe]
+                                  ,[Observation]
+                              FROM [db_a7ba3c_podosysprd].[dbo].[Pacient_tb]
+                              Where [RegisterDate] >= '" + date.ToString("yyyy-MM-dd") + "'AND [RegisterDate] < '" + lastdate.ToString("yyyy-MM-dd") + "'";
 
             return await db.QueryAsync<Pacient>(sql);
         }

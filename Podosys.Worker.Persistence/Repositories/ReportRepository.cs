@@ -74,6 +74,20 @@ namespace Podosys.Worker.Persistence.Repositories
             _context.SaveChanges();
         }
 
+        public async Task AddCommunicationChannelReportAsync(IEnumerable<CommunicationChannel> channels)
+        {
+            var oldReports = await _context.CommunicationChannels
+                            .Where(x => x.Date.Date == channels.FirstOrDefault().Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.CommunicationChannels.RemoveRange(oldReports);
+
+            await _context.CommunicationChannels.AddRangeAsync(channels);
+
+            _context.SaveChanges();
+        }
+
         public async Task AddAgeGroupReportAsync(AgeGroup ageGroup)
         {
             var oldReports = await _context.AgeGroups

@@ -17,6 +17,7 @@ namespace Podosys.Worker.Persistence.Context
         public DbSet<ProfitProfessional> ProfitProfessional { get; set; }
         public DbSet<RegisteredPacient> RegisteredPacients { get; set; }
         public DbSet<UpdateHistory> UpdateHistories { get; set; }
+        public DbSet<CommunicationChannel> CommunicationChannels { get; set; }
 
         public int SaveChangesAsync()
         {

@@ -3,6 +3,9 @@ using Podosys.Worker.Domain.Enums;
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Models.Reports;
 using Podosys.Worker.Domain.Repositories;
+using System.Collections.Generic;
+using System.Threading.Channels;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Podosys.Worker.Domain.Services
 {
@@ -22,38 +25,43 @@ namespace Podosys.Worker.Domain.Services
         {
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
-            if (!transactions.Any() || !transactions.Any(x => x.MedicalRecordId != null))
-                return;
+            if (transactions.Any() || transactions.Any(x => x.MedicalRecordId != null))
+            {
+                var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
 
-            var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
+                var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
 
-            var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
+                var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
 
-            var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
+                var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
 
-            var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
+                var profit = CalculateProfit(transactions);
 
-            var profit = CalculateProfit(transactions);
+                await _reportRepositoty.AddProfitAsync(profit);
 
-            await _reportRepositoty.AddProfitAsync(profit);
+                var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
 
-            var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
+                await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
 
-            await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
+                var procedureReport = CalculateProcedure(procedures, transactions);
 
-            var procedureReport = CalculateProcedure(procedures, transactions);
+                await _reportRepositoty.AddProcedureReportAsync(procedureReport);
 
-            await _reportRepositoty.AddProcedureReportAsync(procedureReport);
+                var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
 
-            var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
+                await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
 
-            await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
+                var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
 
-            var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
+                await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
 
-            await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
+                var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+            }
 
-            var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+            var channels = await CalculateCommunicationChannel(firstdate);
+
+            if (channels.Any())
+                await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
 
             await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now.AddHours(4) });
         }
@@ -82,6 +90,27 @@ namespace Podosys.Worker.Domain.Services
                 Date = date.Date,
                 RegisterAmounth = pacients.Where(x => x.RegisterDate.Date == date).Count()
             };
+        }
+
+        private async Task<IEnumerable<CommunicationChannel>> CalculateCommunicationChannel(DateTime date)
+        {
+            var communicationChannels = new List<CommunicationChannel>();
+
+            var pacientsDay = await _podosysRepository.GetPacientByDate(date);
+
+            var communicationChannelId = pacientsDay.Where(x => x.CommunicationChannelId != null).Select(x => x.CommunicationChannelId).Distinct();
+
+            foreach (var channel in communicationChannelId)
+            {
+                communicationChannels.Add(new CommunicationChannel
+                {
+                    Date = date.Date,
+                    Channel = Enum.GetName(typeof(CommunicationChannelEnum), channel),
+                    Amounth = pacientsDay.Where(x => x.CommunicationChannelId == channel).Count()
+                });
+            }
+
+            return communicationChannels;
         }
 
         private AgeGroup CalculateAgeGroup(IEnumerable<Pacient> pacients, IEnumerable<Models.Podosys.Procedure> procedures, IEnumerable<MedicalRecord> medicalRecords, DateTime date)

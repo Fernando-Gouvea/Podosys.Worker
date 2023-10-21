@@ -33,7 +33,7 @@
 
         public string? Occupation { get; set; }
 
-        public string? HowMeeted { get; set; }
+        public int? CommunicationChannelId { get; set; }
 
         public string? Observation { get; set; }
 
