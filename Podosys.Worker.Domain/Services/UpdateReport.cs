@@ -79,8 +79,26 @@ namespace Podosys.Worker.Domain.Services
                 CashValue = cashValue,
                 CurrentAccountValue = currentAccountValue,
                 Date = transactions.FirstOrDefault().Date.Date,
-                TotalValue = cashValue + currentAccountValue
+                TotalValue = cashValue + currentAccountValue,
+                WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date)
             };
+        }
+
+        private static int WorkingDays(DateTime dateNow)
+        {
+            dateNow = dateNow.AddDays(1);
+
+            var workingDays = 0;
+
+            var lastDay = new DateTime(dateNow.Year, dateNow.Month, DateTime.DaysInMonth(dateNow.Year, dateNow.Month));
+
+            for (DateTime data = dateNow; data <= lastDay; data = data.AddDays(1))
+            {
+                if (data.DayOfWeek != DayOfWeek.Sunday)
+                    workingDays++;
+            }
+
+            return workingDays;
         }
 
         private RegisteredPacient CalculateRegisteredPacient(IEnumerable<Pacient> pacients, DateTime date)
