@@ -104,7 +104,7 @@ namespace Podosys.Worker.Domain.Services
 
             var lastDay = new DateTime(dateNow.Year, dateNow.Month, DateTime.DaysInMonth(dateNow.Year, dateNow.Month));
 
-            for (DateTime data = dateNow; data <= lastDay; data = data.AddDays(1))
+            //dateNow = dateNow.AddDays(1);
             {
                 if (data.DayOfWeek != DayOfWeek.Sunday)
                     workingDays++;
