@@ -23,9 +23,14 @@ namespace Podosys.Worker.Domain.Services
 
         public async Task UpdateReportAsync(DateTime firstdate, DateTime lastdate)
         {
+            //firstdate = DateTime.Parse("01-01-2023");
+            //lastdate = DateTime.Parse("02-01-2023");
+
+            //   for (var date = firstdate; date < DateTime.Now.Date; date = date.AddDays(1))
+            //    {
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
-            if (transactions.Any() || transactions.Any(x => x.MedicalRecordId != null))
+            if (transactions.Any() && transactions.Any(x => x.MedicalRecordId != null))
             {
                 var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
 
@@ -62,6 +67,10 @@ namespace Podosys.Worker.Domain.Services
 
             if (channels.Any())
                 await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
+
+            // firstdate = firstdate.AddDays(1);
+            // lastdate = lastdate.AddDays(1);
+            // }
 
             await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now.AddHours(4) });
         }
