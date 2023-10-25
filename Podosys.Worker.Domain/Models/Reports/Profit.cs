@@ -15,6 +15,10 @@ namespace Podosys.Worker.Domain.Models.Reports
 
         [Column(TypeName = "Decimal(7,2)")]
         public decimal CashValue { get; set; }
+
+        [Column(TypeName = "Decimal(7,2)")]
+        public decimal OperationalCost { get; set; }
+
         public int WorkingDays { get; set; }
     }
 }
