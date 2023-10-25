@@ -1,11 +1,7 @@
-﻿using FluentScheduler;
-using Podosys.Worker.Domain.Enums;
+﻿using Podosys.Worker.Domain.Enums;
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Models.Reports;
 using Podosys.Worker.Domain.Repositories;
-using System.Collections.Generic;
-using System.Threading.Channels;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Podosys.Worker.Domain.Services
 {
@@ -26,8 +22,8 @@ namespace Podosys.Worker.Domain.Services
             //firstdate = DateTime.Parse("01-01-2023");
             //lastdate = DateTime.Parse("02-01-2023");
 
-            //   for (var date = firstdate; date < DateTime.Now.Date; date = date.AddDays(1))
-            //    {
+            //for (var date = firstdate; date < DateTime.Now.Date; date = date.AddDays(1))
+            //{
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
             if (transactions.Any() && transactions.Any(x => x.MedicalRecordId != null))
@@ -68,9 +64,9 @@ namespace Podosys.Worker.Domain.Services
             if (channels.Any())
                 await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
 
-            // firstdate = firstdate.AddDays(1);
-            // lastdate = lastdate.AddDays(1);
-            // }
+            //    firstdate = firstdate.AddDays(1);
+            //    lastdate = lastdate.AddDays(1);
+            //}
 
             await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now.AddHours(4) });
         }
@@ -98,13 +94,11 @@ namespace Podosys.Worker.Domain.Services
 
         private static int WorkingDays(DateTime dateNow)
         {
-            dateNow = dateNow.AddDays(1);
-
             var workingDays = 0;
 
             var lastDay = new DateTime(dateNow.Year, dateNow.Month, DateTime.DaysInMonth(dateNow.Year, dateNow.Month));
 
-            //dateNow = dateNow.AddDays(1);
+            for (DateTime data = dateNow; data < lastDay; data = data.AddDays(1))
             {
                 if (data.DayOfWeek != DayOfWeek.Sunday)
                     workingDays++;
