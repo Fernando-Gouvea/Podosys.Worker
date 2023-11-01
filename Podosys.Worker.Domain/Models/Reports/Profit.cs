@@ -20,5 +20,7 @@ namespace Podosys.Worker.Domain.Models.Reports
         public decimal OperationalCost { get; set; }
 
         public int WorkingDays { get; set; }
+
+        public DateTime UpdateDate { get; set; }
     }
 }

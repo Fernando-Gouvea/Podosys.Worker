@@ -11,7 +11,6 @@ namespace Podosys.Worker.Domain.Repositories
         DbSet<ProcedurePerformed> ProcedurePerformed { get; set; }
         DbSet<ProfitProfessional> ProfitProfessional { get; set; }
         DbSet<RegisteredPacient> RegisteredPacients { get; set; }
-        DbSet<UpdateHistory> UpdateHistories { get; set; }
         DbSet<CommunicationChannel> CommunicationChannels { get; set; }
         int SaveChanges();
     }

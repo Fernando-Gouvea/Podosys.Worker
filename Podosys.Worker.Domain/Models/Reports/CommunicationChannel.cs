@@ -6,5 +6,6 @@
         public DateTime Date { get; set; }
         public int Amounth { get; set; }
         public string Channel { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

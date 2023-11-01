@@ -10,5 +10,6 @@
         public int Young { get; set; }
         public int Adult { get; set; }
         public int Elderly { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

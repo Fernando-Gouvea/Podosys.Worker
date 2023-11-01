@@ -9,6 +9,7 @@ namespace Podosys.Worker.Domain.Services
     {
         private readonly IPodosysRepository _podosysRepository;
         private readonly IReportRepository _reportRepositoty;
+        private readonly DateTime _updateDate = DateTime.Now.AddHours(4);
 
         public UpdateReport(IPodosysRepository podosysRepository,
                             IReportRepository reportRepositoty)
@@ -19,10 +20,17 @@ namespace Podosys.Worker.Domain.Services
 
         public async Task UpdateReportAsync(DateTime firstdate, DateTime lastdate)
         {
-            //firstdate = DateTime.Parse("01-01-2023");
-            //lastdate = DateTime.Parse("02-01-2023");
+            //calculo porcentagem aumento e diminuicao
+            //((v2-v1)/v1)*100
 
-            //for (var date = firstdate; date < DateTime.Now.Date; date = date.AddDays(1))
+            //IBGE inpc
+            //https://servicodados.ibge.gov.br/api/v3/agregados/7063/periodos/202301|202302|202303|202304|202305|202306|202307|202308|202309/variaveis/44|68?localidades=N1[all]&classificacao=315[7169]
+            //Doc https://servicodados.ibge.gov.br/api/docs/agregados?versao=3#api-acervo
+
+            //firstdate = DateTime.Parse("01-11-2023");
+            //lastdate = DateTime.Parse("02-11-2023");
+
+            //for (var date = firstdate; date <= DateTime.Now.Date; date = date.AddDays(1))
             //{
             var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
 
@@ -57,6 +65,8 @@ namespace Podosys.Worker.Domain.Services
                 await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
 
                 var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+
+                await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
             }
 
             var channels = await CalculateCommunicationChannel(firstdate);
@@ -64,11 +74,9 @@ namespace Podosys.Worker.Domain.Services
             if (channels.Any())
                 await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
 
-            //    firstdate = firstdate.AddDays(1);
-            //    lastdate = lastdate.AddDays(1);
-            //}
-
-            await _reportRepositoty.AddUpdateHistoryReportAsync(new UpdateHistory { Date = DateTime.Now.AddHours(4) });
+            // firstdate = firstdate.AddDays(1);
+            // lastdate = lastdate.AddDays(1);
+            // }
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)
@@ -88,7 +96,8 @@ namespace Podosys.Worker.Domain.Services
                 Date = transactions.FirstOrDefault().Date.Date,
                 TotalValue = cashValue + currentAccountValue,
                 OperationalCost = operecionalCost,
-                WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date)
+                WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date),
+                UpdateDate = _updateDate
             };
         }
 
@@ -112,7 +121,8 @@ namespace Podosys.Worker.Domain.Services
             return new RegisteredPacient
             {
                 Date = date.Date,
-                RegisterAmounth = pacients.Where(x => x.RegisterDate.Date == date).Count()
+                RegisterAmounth = pacients.Where(x => x.RegisterDate.Date == date).Count(),
+                UpdateDate = _updateDate
             };
         }
 
@@ -130,7 +140,8 @@ namespace Podosys.Worker.Domain.Services
                 {
                     Date = date.Date,
                     Channel = Enum.GetName(typeof(CommunicationChannelEnum), channel),
-                    Amounth = pacientsDay.Where(x => x.CommunicationChannelId == channel).Count()
+                    Amounth = pacientsDay.Where(x => x.CommunicationChannelId == channel).Count(),
+                    UpdateDate = _updateDate
                 });
             }
 
@@ -153,7 +164,8 @@ namespace Podosys.Worker.Domain.Services
                 Teenager = listPacients.Where(x => x.Age >= 12 && x.Age < 18).Count(),
                 Young = listPacients.Where(x => x.Age >= 18 && x.Age < 30).Count(),
                 Adult = listPacients.Where(x => x.Age >= 30 && x.Age < 60).Count(),
-                Elderly = listPacients.Where(x => x.Age >= 60 && x.Age < 150).Count()
+                Elderly = listPacients.Where(x => x.Age >= 60 && x.Age < 150).Count(),
+                UpdateDate = _updateDate
             };
         }
 
@@ -165,6 +177,7 @@ namespace Podosys.Worker.Domain.Services
                     BandAidProcedureAmount = 0,
                     ProcedureAmount = 0,
                     Date = date.Date,
+                    UpdateDate = _updateDate
                 };
 
             var procedureBandaid = MedialRecordProcedureBandaid(procedure);
@@ -175,6 +188,7 @@ namespace Podosys.Worker.Domain.Services
                 BandAidProcedureAmount = procedureBandaid.Item2.Count(),
                 TotalAmount = procedureBandaid.Item1.Count() + procedureBandaid.Item2.Count(),
                 Date = date.Date,
+                UpdateDate = _updateDate
             };
         }
 
@@ -195,7 +209,8 @@ namespace Podosys.Worker.Domain.Services
                     Date = transactions.FirstOrDefault().Date.Date,
                     Amounth = procedures.Where(x => x.ProcedureType.Equals(procedure)).Count(),
                     ProcedureName = procedure,
-                    Value = value
+                    Value = value,
+                    UpdateDate = _updateDate
                 };
 
                 response.Add(report);
@@ -208,7 +223,8 @@ namespace Podosys.Worker.Domain.Services
                     Date = transactions.FirstOrDefault().Date.Date,
                     Amounth = 1,
                     ProcedureName = "Prontuarios Não Fechados",
-                    Value = 0
+                    Value = 0,
+                    UpdateDate = _updateDate
                 };
 
                 response.Add(report);
@@ -235,7 +251,8 @@ namespace Podosys.Worker.Domain.Services
                     Professional = professional.Name,
                     Value = transaction.Sum(x => x.Value),
                     ProcedureAmount = medicalRecord.Where(x => medicalRecordBandaid.Item1.Contains(x.Id)).Count(),
-                    BandaidAmount = medicalRecord.Where(x => medicalRecordBandaid.Item2.Contains(x.Id)).Count()
+                    BandaidAmount = medicalRecord.Where(x => medicalRecordBandaid.Item2.Contains(x.Id)).Count(),
+                    UpdateDate = _updateDate
                 });
             }
 

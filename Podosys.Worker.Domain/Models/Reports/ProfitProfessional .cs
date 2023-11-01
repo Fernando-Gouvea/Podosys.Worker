@@ -12,5 +12,7 @@ namespace Podosys.Worker.Domain.Models.Reports
 
         [Column(TypeName = "Decimal(7,2)")]
         public decimal Value { get; set; }
+
+        public DateTime UpdateDate { get; set; }
     }
 }

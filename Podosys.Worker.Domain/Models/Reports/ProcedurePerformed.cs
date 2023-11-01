@@ -7,5 +7,6 @@
         public int ProcedureAmount { get; set; }
         public int BandAidProcedureAmount { get; set; }
         public int TotalAmount { get; set; }
+        public DateTime UpdateDate { get; set; }
     }
 }

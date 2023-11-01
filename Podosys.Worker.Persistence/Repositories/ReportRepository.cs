@@ -115,12 +115,5 @@ namespace Podosys.Worker.Persistence.Repositories
 
             _context.SaveChanges();
         }
-
-        public async Task AddUpdateHistoryReportAsync(UpdateHistory updateHistory)
-        {
-            await _context.UpdateHistories.AddAsync(updateHistory);
-
-            _context.SaveChanges();
-        }
     }
 }
