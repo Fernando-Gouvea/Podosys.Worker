@@ -9,7 +9,7 @@ namespace Podosys.Worker.Domain.Services
     {
         private readonly IPodosysRepository _podosysRepository;
         private readonly IReportRepository _reportRepositoty;
-        private readonly DateTime _updateDate = DateTime.Now.AddHours(4);
+        private readonly DateTime _updateDate = DateTime.Now.AddHours(0);
 
         public UpdateReport(IPodosysRepository podosysRepository,
                             IReportRepository reportRepositoty)
@@ -27,8 +27,8 @@ namespace Podosys.Worker.Domain.Services
             //https://servicodados.ibge.gov.br/api/v3/agregados/7063/periodos/202301|202302|202303|202304|202305|202306|202307|202308|202309/variaveis/44|68?localidades=N1[all]&classificacao=315[7169]
             //Doc https://servicodados.ibge.gov.br/api/docs/agregados?versao=3#api-acervo
 
-            //firstdate = DateTime.Parse("01-11-2023");
-            //lastdate = DateTime.Parse("02-11-2023");
+            //firstdate = DateTime.Parse("01-01-2023");
+            //lastdate = DateTime.Parse("02-01-2023");
 
             //for (var date = firstdate; date <= DateTime.Now.Date; date = date.AddDays(1))
             //{
@@ -74,9 +74,9 @@ namespace Podosys.Worker.Domain.Services
             if (channels.Any())
                 await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
 
-            // firstdate = firstdate.AddDays(1);
-            // lastdate = lastdate.AddDays(1);
-            // }
+            //    firstdate = firstdate.AddDays(1);
+            //    lastdate = lastdate.AddDays(1);
+            //}
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)
@@ -252,11 +252,21 @@ namespace Podosys.Worker.Domain.Services
                     Value = transaction.Sum(x => x.Value),
                     ProcedureAmount = medicalRecord.Where(x => medicalRecordBandaid.Item1.Contains(x.Id)).Count(),
                     BandaidAmount = medicalRecord.Where(x => medicalRecordBandaid.Item2.Contains(x.Id)).Count(),
-                    UpdateDate = _updateDate
+                    UpdateDate = _updateDate,
+                    PendingClosingAmount = CalculatePendingClosing(professional, procedures, medicalRecords, transactions)
                 });
             }
 
             return profit;
+        }
+
+        private static int CalculatePendingClosing(Professional professional, IEnumerable<Models.Podosys.Procedure> procedures, IEnumerable<MedicalRecord> medicalRecords, IEnumerable<Transaction> transactions)
+        {
+            var medicalRecord = medicalRecords.Where(m => m.UserId == professional.Id &&
+                                                          string.IsNullOrEmpty(m.Observation) &&
+                                                          !procedures.Any(x => x.MedicalRecordId == m.Id));
+
+            return transactions.Where(x => medicalRecord.Any(m => m.Id == x.MedicalRecordId)).Count();
         }
 
         private Tuple<IEnumerable<Guid>, IEnumerable<Guid>> MedialRecordProcedureBandaid(IEnumerable<Models.Podosys.Procedure> procedures)
