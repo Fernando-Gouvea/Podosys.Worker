@@ -74,8 +74,8 @@ namespace Podosys.Worker.Domain.Services
             if (channels.Any())
                 await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
 
-            //    firstdate = firstdate.AddDays(1);
-            //    lastdate = lastdate.AddDays(1);
+            //firstdate = firstdate.AddDays(1);
+            //lastdate = lastdate.AddDays(1);
             //}
         }
 
@@ -132,17 +132,22 @@ namespace Podosys.Worker.Domain.Services
 
             var pacientsDay = await _podosysRepository.GetPacientByDate(date);
 
-            var communicationChannelId = pacientsDay.Where(x => x.CommunicationChannelId != null).Select(x => x.CommunicationChannelId).Distinct();
-
-            foreach (var channel in communicationChannelId)
+            if (pacientsDay.Any())
             {
-                communicationChannels.Add(new CommunicationChannel
+                var podosysCommunications = await _podosysRepository.GetAllCommunicationChannel();
+
+                var communicationChannelId = pacientsDay.Where(x => x.CommunicationChannelId != null).Select(x => x.CommunicationChannelId).Distinct();
+
+                foreach (var channel in communicationChannelId)
                 {
-                    Date = date.Date,
-                    Channel = Enum.GetName(typeof(CommunicationChannelEnum), channel),
-                    Amounth = pacientsDay.Where(x => x.CommunicationChannelId == channel).Count(),
-                    UpdateDate = _updateDate
-                });
+                    communicationChannels.Add(new CommunicationChannel
+                    {
+                        Date = date.Date,
+                        Channel = podosysCommunications.FirstOrDefault(x => x.Id == channel).Name,
+                        Amounth = pacientsDay.Where(x => x.CommunicationChannelId == channel).Count(),
+                        UpdateDate = _updateDate
+                    });
+                }
             }
 
             return communicationChannels;

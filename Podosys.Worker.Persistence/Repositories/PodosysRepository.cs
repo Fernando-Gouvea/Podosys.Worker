@@ -178,5 +178,16 @@ namespace Podosys.Worker.Persistence.Repositories
 
             return await db.QueryAsync<Professional>(sql);
         }
+
+        public async Task<IEnumerable<PodosysCommunicationChannel>> GetAllCommunicationChannel()
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            string sql = @"SELECT [Id]
+                                 ,[Name]
+                                  FROM [db_a7ba3c_podosysprd].[dbo].[CommunicationChannel_tb]";
+
+            return await db.QueryAsync<PodosysCommunicationChannel>(sql);
+        }
     }
 }
