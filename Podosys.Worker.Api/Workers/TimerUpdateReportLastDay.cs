@@ -16,7 +16,7 @@ namespace Podosys.Worker.Api.Workers
             try
             {
                 var svc = scope.ServiceProvider.GetRequiredService<IUpdateReport>();
-                await svc.UpdateReportAsync(DateTime.Now.Date.AddDays(-1), DateTime.Now.Date);
+                await svc.UpdateReportAsync(DateTime.Now.Date.AddDays(-35), DateTime.Now.Date);
             }
             catch (Exception ex)
             {

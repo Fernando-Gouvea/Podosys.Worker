@@ -30,53 +30,50 @@ namespace Podosys.Worker.Domain.Services
             //firstdate = DateTime.Parse("01-11-2023");
             //lastdate = DateTime.Parse("02-11-2023");
 
-            //for (var date = firstdate; date <= DateTime.Now.Date; date = date.AddDays(1))
-            //{
-            var transactions = await _podosysRepository.GetTransaction(firstdate, lastdate);
-
-            if (transactions.Any() && transactions.Any(x => x.MedicalRecordId != null))
+            for (var count = 0; firstdate <= lastdate; firstdate = firstdate.AddDays(1))
             {
-                var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
+                var transactions = await _podosysRepository.GetTransaction(firstdate);
 
-                var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
+                if (transactions.Any() && transactions.Any(x => x.MedicalRecordId != null))
+                {
+                    var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
 
-                var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
+                    var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
 
-                var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
+                    var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
 
-                var profit = CalculateProfit(transactions);
+                    var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
 
-                await _reportRepositoty.AddProfitAsync(profit);
+                    var profit = CalculateProfit(transactions);
 
-                var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
+                    await _reportRepositoty.AddProfitAsync(profit);
 
-                await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
+                    var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
 
-                var procedureReport = CalculateProcedure(procedures, transactions);
+                    await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
 
-                await _reportRepositoty.AddProcedureReportAsync(procedureReport);
+                    var procedureReport = CalculateProcedure(procedures, transactions);
 
-                var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
+                    await _reportRepositoty.AddProcedureReportAsync(procedureReport);
 
-                await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
+                    var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
 
-                var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
+                    await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
 
-                await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
+                    var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
 
-                var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+                    await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
 
-                await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+                    var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+
+                    await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+                }
+
+                var channels = await CalculateCommunicationChannel(firstdate);
+
+                if (channels.Any())
+                    await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
             }
-
-            var channels = await CalculateCommunicationChannel(firstdate);
-
-            if (channels.Any())
-                await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
-
-            //    firstdate = firstdate.AddDays(1);
-            //    lastdate = lastdate.AddDays(1);
-            //}
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)

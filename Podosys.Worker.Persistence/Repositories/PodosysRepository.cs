@@ -17,7 +17,7 @@ namespace Podosys.Worker.Persistence.Repositories
             _podosysConnectionString = configuration.GetConnectionString("PodosysConnection") ?? "";
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransaction(DateTime FirstDate, DateTime LastDate)
+        public async Task<IEnumerable<Transaction>> GetTransaction(DateTime FirstDate)
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
@@ -34,7 +34,7 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[TransactionTypeId]
                                  ,[PaymentTypeId]
                              FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
-                             Where [Date] >= '" + FirstDate.ToString("yyyy-MM-dd") + "'AND [Date] < '" + LastDate.ToString("yyyy-MM-dd") + "'";
+                             Where [Date] >= '" + FirstDate.ToString("yyyy-MM-dd") + "'AND [Date] < '" + FirstDate.AddDays(1).ToString("yyyy-MM-dd") + "'";
 
             return await db.QueryAsync<Transaction>(sql);
         }
