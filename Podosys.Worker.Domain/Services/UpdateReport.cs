@@ -9,7 +9,7 @@ namespace Podosys.Worker.Domain.Services
     {
         private readonly IPodosysRepository _podosysRepository;
         private readonly IReportRepository _reportRepositoty;
-        private readonly DateTime _updateDate = DateTime.Now.AddHours(4);
+        private readonly DateTime _updateDate = DateTime.Now.AddHours(5);
 
         public UpdateReport(IPodosysRepository podosysRepository,
                             IReportRepository reportRepositoty)

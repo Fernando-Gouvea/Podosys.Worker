@@ -18,7 +18,7 @@ builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
 builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
 builder.Services.AddCronJob<TimerUpdateReportLastDay>(c => { c.CronExpression = "0 6 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
-builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "0 10,12,14,16,18,20,22 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "0 10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 //builder.Services.AddCronJob<TimerNoHibernate>(c => { c.CronExpression = "*/10 * * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
 builder.Services.AddControllers();
