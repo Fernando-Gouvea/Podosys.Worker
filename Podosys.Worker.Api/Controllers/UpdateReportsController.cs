@@ -5,23 +5,25 @@ namespace Podosys.Worker.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class UpdateReportsController : ControllerBase
     {
         private readonly IUpdateReport _updateReport;
 
-        public WeatherForecastController(IUpdateReport updateReport)
+        public UpdateReportsController(IUpdateReport updateReport)
         {
             _updateReport = updateReport;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public async Task<string> Get()
+        [HttpGet("WorkerStatus/{id}")]
+        public async Task<IActionResult> WorkerStatus(string id)
         {
+            if (!id.Equals("6e17f771-dedd-41c9-8fdb-9184e4265959"))
+                return Unauthorized();
+
             var file = "";
 
             try
             {
-                //await _updateReport.UpdateReportAsync();
                 var stream = new StreamReader("cronjob-status-info-TimerUpdateReportCurrentDay.txt");
 
                 string? line;
@@ -40,10 +42,27 @@ namespace Podosys.Worker.Api.Controllers
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                return NotFound(ex.Message);
             }
 
-            return file;
+            return Ok(file);
+        }
+
+        [HttpGet("UpdateReportByDate/{id}")]
+        public async Task<IActionResult> UpdateReportByDate([FromRoute] string id, DateTime? firstDate, DateTime? lastDate)
+        {
+            if (!id.Equals("93418540-0d7c-48c9-8076-a5e16bd5be42"))
+                return Unauthorized();
+
+            if (firstDate == null || lastDate == null)
+            {
+                firstDate = DateTime.Now;
+                lastDate = DateTime.Now;
+            }
+
+            await _updateReport.UpdateReportAsync((DateTime)firstDate, (DateTime)lastDate);
+
+            return Ok();
         }
     }
 }
