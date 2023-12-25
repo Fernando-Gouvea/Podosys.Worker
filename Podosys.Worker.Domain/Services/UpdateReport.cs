@@ -34,39 +34,42 @@ namespace Podosys.Worker.Domain.Services
             {
                 var transactions = await _podosysRepository.GetTransaction(firstdate);
 
-                if (transactions.Any() && transactions.Any(x => x.MedicalRecordId != null))
+                if (transactions.Any())
                 {
-                    var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
-
-                    var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
-
-                    var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
-
-                    var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
-
                     var profit = CalculateProfit(transactions);
 
                     await _reportRepositoty.AddProfitAsync(profit);
+                   
+                    if (transactions.Any(x => x.MedicalRecordId != null))
+                    {
+                        var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
 
-                    var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
+                        var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
 
-                    await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
+                        var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
 
-                    var procedureReport = CalculateProcedure(procedures, transactions);
+                        var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
 
-                    await _reportRepositoty.AddProcedureReportAsync(procedureReport);
+                        var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
 
-                    var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
+                        await _reportRepositoty.AddProcedurePerformedAsync(procedureProfit);
 
-                    await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
+                        var procedureReport = CalculateProcedure(procedures, transactions);
 
-                    var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
+                        await _reportRepositoty.AddProcedureReportAsync(procedureReport);
 
-                    await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
+                        var registerPacient = CalculateRegisteredPacient(pacients, firstdate);
 
-                    var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+                        await _reportRepositoty.AddRegisterPacientReportAsync(registerPacient);
 
-                    await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+                        var AgeReport = CalculateAgeGroup(pacients, procedures, medicalRecords, firstdate);
+
+                        await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
+
+                        var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+
+                        await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+                    }
                 }
 
                 var channels = await CalculateCommunicationChannel(firstdate);
