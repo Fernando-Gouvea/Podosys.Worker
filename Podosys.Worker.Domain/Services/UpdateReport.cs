@@ -39,7 +39,17 @@ namespace Podosys.Worker.Domain.Services
                     var profit = CalculateProfit(transactions);
 
                     await _reportRepositoty.AddProfitAsync(profit);
-                   
+
+                    var saleoff = CalculateSaleOffs(transactions);
+
+                    if (saleoff != null)
+                        await _reportRepositoty.AddSaleOffAsync(saleoff);
+
+                    var operacionalCost = CalculateOperacionalCost(transactions);
+
+                    if (operacionalCost != null)
+                        await _reportRepositoty.AddOperacionalCostAsync(operacionalCost);
+
                     if (transactions.Any(x => x.MedicalRecordId != null))
                     {
                         var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
@@ -99,6 +109,46 @@ namespace Podosys.Worker.Domain.Services
                 WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date),
                 UpdateDate = _updateDate
             };
+        }
+
+        private SaleOffReport CalculateSaleOffs(IEnumerable<Transaction> transactions)
+        {
+            if (!transactions.Where(x => x.SaleOffId != null).Any())
+                return null;
+
+            var saleoffValue = transactions.Where(x => x.SaleOffId != null).Sum(x => x.Value);
+
+            return new SaleOffReport
+            {
+                Amounth = transactions.Where(x => x.SaleOffId != null).Count(),
+                Value = saleoffValue,
+                Date = transactions.FirstOrDefault().Date.Date,
+                UpdateDate = _updateDate
+            };
+        }
+
+        private List<OperationalCostReport> CalculateOperacionalCost(IEnumerable<Transaction> transactions)
+        {
+            var operacionalCostReport = new List<OperationalCostReport>();
+
+            var operacionalCost = transactions.Where(x => x.TransactionTypeId == (int)TransactionTypeEnum.Saida);
+
+            if (!operacionalCost.Any())
+                return null;
+
+            foreach (var cost in operacionalCost)
+            {
+                operacionalCostReport.Add(
+                        new OperationalCostReport
+                        {
+                            CostName = cost.Description,
+                            Value = cost.Value,
+                            Date = cost.Date.Date,
+                            UpdateDate = _updateDate
+                        });
+            }
+
+            return operacionalCostReport;
         }
 
         private static int WorkingDays(DateTime dateNow)

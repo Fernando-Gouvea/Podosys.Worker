@@ -12,5 +12,7 @@ namespace Podosys.Worker.Domain.Repositories
         Task AddAgeGroupReportAsync(AgeGroup ageGroup);
         Task AddProfitProfessionalReportAsync(IEnumerable<ProfitProfessional> profit);
         Task AddCommunicationChannelReportAsync(IEnumerable<CommunicationChannel> channels);
+        Task AddOperacionalCostAsync(List<OperationalCostReport> operacionalCost);
+        Task AddSaleOffAsync(SaleOffReport saleoff);
     }
 }

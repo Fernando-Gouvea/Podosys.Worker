@@ -115,5 +115,33 @@ namespace Podosys.Worker.Persistence.Repositories
 
             _context.SaveChanges();
         }
+
+        public async Task AddOperacionalCostAsync(List<OperationalCostReport> operacionalCost)
+        {
+            var oldReports = await _context.OperationalCostReport
+                            .Where(x => x.Date.Date == operacionalCost.FirstOrDefault().Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.OperationalCostReport.RemoveRange(oldReports);
+
+            await _context.OperationalCostReport.AddRangeAsync(operacionalCost);
+
+            _context.SaveChanges();
+        }
+
+        public async Task AddSaleOffAsync(SaleOffReport saleoff)
+        {
+            var oldReports = await _context.SaleOffReport
+                            .Where(x => x.Date.Date == saleoff.Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.SaleOffReport.RemoveRange(oldReports);
+
+            await _context.SaleOffReport.AddAsync(saleoff);
+
+            _context.SaveChanges();
+        }
     }
 }
