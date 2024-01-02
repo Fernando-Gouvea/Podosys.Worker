@@ -60,7 +60,7 @@ namespace Podosys.Worker.Api.Controllers
                 lastDate = DateTime.Now;
             }
 
-            await _updateReport.UpdateReportAsync((DateTime)firstDate, (DateTime)lastDate);
+            _updateReport.UpdateReportAsync((DateTime)firstDate, (DateTime)lastDate);
 
             return Ok();
         }
