@@ -97,7 +97,7 @@ namespace Podosys.Worker.Domain.Services
             var currentAccountValue = transactions.Where(x => x.PaymentTypeId != (int)PaymentTypeEnum.Dinheiro &&
                                                         (x.MedicalRecordId != null || x.OrderId != null || x.SaleOffId != null)).Sum(x => x.Value);
 
-            var operecionalCost = transactions.Where(x => x.TransactionTypeId == (int)TransactionTypeEnum.Saida && x.MedicalRecordId == null && x.OrderId == null && x.SaleOffId == null).Sum(x => x.Value);
+            var operecionalCost = transactions.Where(x => x.TransactionTypeId == (int)TransactionTypeEnum.Saida && x.MedicalRecordId == null && x.OrderId == null && x.SaleOffId == null);
 
             return new Profit
             {
@@ -105,8 +105,8 @@ namespace Podosys.Worker.Domain.Services
                 CurrentAccountValue = currentAccountValue,
                 Date = transactions.FirstOrDefault().Date.Date,
                 TotalValue = cashValue + currentAccountValue,
-                OperationalCost = operecionalCost,
-                AccountBalance = currentAccountValue - operecionalCost,
+                OperationalCost = operecionalCost.Sum(x => x.Value),
+                AccountBalance = currentAccountValue - operecionalCost.Where(x => x.PaymentTypeId != (int)PaymentTypeEnum.Dinheiro).Sum(x => x.Value),
                 WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date),
                 UpdateDate = _updateDate
             };
