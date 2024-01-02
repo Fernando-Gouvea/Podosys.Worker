@@ -106,6 +106,7 @@ namespace Podosys.Worker.Domain.Services
                 Date = transactions.FirstOrDefault().Date.Date,
                 TotalValue = cashValue + currentAccountValue,
                 OperationalCost = operecionalCost,
+                AccountBalance = currentAccountValue - operecionalCost,
                 WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date),
                 UpdateDate = _updateDate
             };
