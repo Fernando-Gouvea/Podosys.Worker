@@ -11,5 +11,6 @@ namespace Podosys.Worker.Domain.Repositories
         Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds);
         Task<IEnumerable<PodosysCommunicationChannel>> GetAllCommunicationChannel();
         Task<IEnumerable<Pacient>> GetPacientByDate(DateTime date);
+        Task<IEnumerable<TransactionCategory>> GetAllTransactionCategory();
     }
 }

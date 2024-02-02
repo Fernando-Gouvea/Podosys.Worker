@@ -33,10 +33,22 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[SaleOffId]
                                  ,[TransactionTypeId]
                                  ,[PaymentTypeId]
+                                 ,[TransactionCategoryId]
                              FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
                              Where [Date] >= '" + FirstDate.ToString("yyyy-MM-dd") + "'AND [Date] < '" + FirstDate.AddDays(1).ToString("yyyy-MM-dd") + "'";
 
             return await db.QueryAsync<Transaction>(sql);
+        }
+
+        public async Task<IEnumerable<TransactionCategory>> GetAllTransactionCategory()
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            string sql = @"SELECT [Id] 
+                                 ,[Name]
+                             FROM [db_a7ba3c_podosysprd].[dbo].[TransactionCategory_tb]";  
+
+            return await db.QueryAsync<TransactionCategory>(sql);
         }
 
         public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(IEnumerable<Guid> medicalRecordIds)

@@ -11,6 +11,7 @@
         public decimal Value { get; set; }
         public string? Description { get; set; }
         public int? TransactionTypeId { get; set; }
+        public int? TransactionCategoryId { get; set; }
         public int? PaymentTypeId { get; set; }
     }
 }

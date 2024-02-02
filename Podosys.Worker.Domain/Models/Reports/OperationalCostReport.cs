@@ -7,6 +7,7 @@ namespace Podosys.Worker.Domain.Models.Reports
         public int Id { get; set; }
         public DateTime Date { get; set; }
         public string? CostName { get; set; }
+        public string? Category { get; set; }
 
         [Column(TypeName = "Decimal(7,2)")]
         public decimal Value { get; set; }

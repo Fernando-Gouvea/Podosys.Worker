@@ -45,7 +45,9 @@ namespace Podosys.Worker.Domain.Services
                     if (saleoff != null)
                         await _reportRepositoty.AddSaleOffAsync(saleoff);
 
-                    var operacionalCost = CalculateOperacionalCost(transactions);
+                    var transactionsCategoty = await _podosysRepository.GetAllTransactionCategory();
+
+                    var operacionalCost = CalculateOperacionalCost(transactions, transactionsCategoty);
 
                     if (operacionalCost != null)
                         await _reportRepositoty.AddOperacionalCostAsync(operacionalCost);
@@ -128,7 +130,7 @@ namespace Podosys.Worker.Domain.Services
             };
         }
 
-        private List<OperationalCostReport> CalculateOperacionalCost(IEnumerable<Transaction> transactions)
+        private List<OperationalCostReport> CalculateOperacionalCost(IEnumerable<Transaction> transactions, IEnumerable<TransactionCategory> category)
         {
             var operacionalCostReport = new List<OperationalCostReport>();
 
@@ -145,6 +147,7 @@ namespace Podosys.Worker.Domain.Services
                             CostName = cost.Description,
                             Value = cost.Value,
                             Date = cost.Date.Date,
+                            Category = category.FirstOrDefault(x => x.Id == cost.TransactionCategoryId)?.Name,
                             UpdateDate = _updateDate
                         });
             }

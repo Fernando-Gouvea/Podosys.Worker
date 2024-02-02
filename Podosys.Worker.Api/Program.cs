@@ -19,16 +19,15 @@ builder.Services.AddTransient<IUpdateReport, UpdateReport>();
 
 builder.Services.AddCronJob<TimerUpdateReportLastDay>(c => { c.CronExpression = "0 6 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "0 10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
+builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "* * * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 //builder.Services.AddCronJob<TimerNoHibernate>(c => { c.CronExpression = "*/10 * * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
