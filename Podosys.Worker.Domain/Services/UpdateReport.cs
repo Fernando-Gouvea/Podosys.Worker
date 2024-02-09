@@ -108,7 +108,7 @@ namespace Podosys.Worker.Domain.Services
                 {
                     Date = date.Date,
                     UpdateDate = _updateDate,
-                    Neighborhood = item.Neighborhood,
+                    Neighborhood = item.Neighborhood ?? item.City,
                     Street = item.Street,
                     City = item.City,
                     State = item.State,
