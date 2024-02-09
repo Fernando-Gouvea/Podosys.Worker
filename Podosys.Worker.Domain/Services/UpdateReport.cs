@@ -102,7 +102,7 @@ namespace Podosys.Worker.Domain.Services
         {
             var addresses = new List<AddressReport>();
 
-            foreach (var item in address)
+            foreach (var item in address.Where(x => x.PostalCode != null && x.Latitude != null))
             {
                 addresses.Add(new AddressReport
                 {
