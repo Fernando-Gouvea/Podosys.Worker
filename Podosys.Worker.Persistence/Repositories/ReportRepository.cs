@@ -130,6 +130,21 @@ namespace Podosys.Worker.Persistence.Repositories
             _context.SaveChanges();
         }
 
+        public async Task AddAddressReportAsync(List<AddressReport> addressReport)
+        {
+            var oldReports = await _context.AddressReport
+                            .Where(x => x.Date.Date == addressReport.FirstOrDefault().Date.Date)
+                            .ToListAsync();
+
+            if (oldReports.Any())
+                _context.AddressReport.RemoveRange(oldReports);
+
+            await _context.AddressReport.AddRangeAsync(addressReport);
+
+            _context.SaveChanges();
+        }
+
+
         public async Task AddSaleOffAsync(SaleOffReport saleoff)
         {
             var oldReports = await _context.SaleOffReport

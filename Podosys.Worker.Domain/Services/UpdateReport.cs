@@ -60,6 +60,8 @@ namespace Podosys.Worker.Domain.Services
 
                         var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
 
+                        var address = await _podosysRepository.GetAddress(pacients.Where(x => x.AddressId != null).Select(x => (Guid)x.AddressId));
+
                         var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
 
                         var procedureProfit = CalculateProcedurePerformed(procedures, firstdate);
@@ -81,6 +83,11 @@ namespace Podosys.Worker.Domain.Services
                         var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
 
                         await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+
+                        var addressReport = CalculateCustomersAddress(address, firstdate);
+
+                        if (addressReport != null)
+                            await _reportRepositoty.AddAddressReportAsync(addressReport);
                     }
                 }
 
@@ -89,6 +96,28 @@ namespace Podosys.Worker.Domain.Services
                 if (channels.Any())
                     await _reportRepositoty.AddCommunicationChannelReportAsync(channels);
             }
+        }
+
+        private List<AddressReport> CalculateCustomersAddress(IEnumerable<Address> address, DateTime date)
+        {
+            var addresses = new List<AddressReport>();
+
+            foreach (var item in address)
+            {
+                addresses.Add(new AddressReport
+                {
+                    Date = date.Date,
+                    UpdateDate = _updateDate,
+                    Neighborhood = item.Neighborhood,
+                    City = item.City,
+                    State = item.State,
+                    PostalCode = item.PostalCode,
+                    Latitude = item.Latitude,
+                    Longitude = item.Longitude,
+                });
+            }
+
+            return addresses;
         }
 
         private Profit CalculateProfit(IEnumerable<Transaction> transactions)

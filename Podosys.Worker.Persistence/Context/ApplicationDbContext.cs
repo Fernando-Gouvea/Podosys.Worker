@@ -10,6 +10,7 @@ namespace Podosys.Worker.Persistence.Context
            : base(options)
         {
         }
+
         public DbSet<AgeGroup> AgeGroups { get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<Profit> Profit { get; set; }
@@ -19,6 +20,7 @@ namespace Podosys.Worker.Persistence.Context
         public DbSet<CommunicationChannel> CommunicationChannels { get; set; }
         public DbSet<SaleOffReport> SaleOffReport { get; set; }
         public DbSet<OperationalCostReport> OperationalCostReport { get; set; }
+        public DbSet<AddressReport> AddressReport { get; set; }
 
         public int SaveChangesAsync()
         {

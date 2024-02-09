@@ -46,7 +46,7 @@ namespace Podosys.Worker.Persistence.Repositories
 
             string sql = @"SELECT [Id] 
                                  ,[Name]
-                             FROM [db_a7ba3c_podosysprd].[dbo].[TransactionCategory_tb]";  
+                             FROM [db_a7ba3c_podosysprd].[dbo].[TransactionCategory_tb]";
 
             return await db.QueryAsync<TransactionCategory>(sql);
         }
@@ -120,6 +120,37 @@ namespace Podosys.Worker.Persistence.Repositories
 
             return await db.QueryAsync<Pacient>(sql);
         }
+
+        public async Task<IEnumerable<Address>> GetAddress(IEnumerable<Guid> addressIds)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var addressId in addressIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[Id] ='" + addressId.ToString() + "'";
+            }
+
+            string sql = @"SELECT 
+                               [Id] 
+                              ,[Street]
+                              ,[Number]
+                              ,[Complement]
+                              ,[Neighborhood]
+                              ,[City]
+                              ,[State]
+                              ,[PostalCode]
+                              ,[Country]
+                              ,[Latitude]
+                              ,[Longitude]
+                            FROM [db_a7ba3c_podosysprd].[dbo].[Address_tb]
+                            Where " + ids;
+
+            return await db.QueryAsync<Address>(sql);
+        }
+
 
         public async Task<IEnumerable<Pacient>> GetPacientByDate(DateTime date)
         {
