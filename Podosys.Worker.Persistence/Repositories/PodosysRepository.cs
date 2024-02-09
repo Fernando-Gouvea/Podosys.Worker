@@ -121,17 +121,20 @@ namespace Podosys.Worker.Persistence.Repositories
             return await db.QueryAsync<Pacient>(sql);
         }
 
-        public async Task<IEnumerable<Address>> GetAddress(IEnumerable<Guid> addressIds)
+        public async Task<IEnumerable<Address>> GetAddress(IEnumerable<Guid?> addressIds)
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
             var ids = string.Empty;
 
-            foreach (var addressId in addressIds)
+            foreach (var addressId in addressIds.Where(x => x != null && x != Guid.Empty))
             {
                 ids += ids != string.Empty ? "or" : "";
                 ids += "[Id] ='" + addressId.ToString() + "'";
             }
+
+            if (string.IsNullOrEmpty(ids))
+                return null;
 
             string sql = @"SELECT 
                                [Id] 

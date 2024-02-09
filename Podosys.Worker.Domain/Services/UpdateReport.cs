@@ -60,7 +60,7 @@ namespace Podosys.Worker.Domain.Services
 
                         var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));
 
-                        var address = await _podosysRepository.GetAddress(pacients.Where(x => x.AddressId != null).Select(x => (Guid)x.AddressId));
+                        var address = await _podosysRepository.GetAddress(pacients.Where(x => x.AddressId != null).Select(x => x.AddressId));
 
                         var procedures = await _podosysRepository.GetProcedure(medicalRecords.Select(x => x.Id));
 
@@ -84,7 +84,7 @@ namespace Podosys.Worker.Domain.Services
 
                         await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
 
-                        var addressReport = CalculateCustomersAddress(address, firstdate);
+                        var addressReport = address != null ? CalculateCustomersAddress(address, firstdate) : null;
 
                         if (addressReport != null)
                             await _reportRepositoty.AddAddressReportAsync(addressReport);
@@ -109,6 +109,7 @@ namespace Podosys.Worker.Domain.Services
                     Date = date.Date,
                     UpdateDate = _updateDate,
                     Neighborhood = item.Neighborhood,
+                    Street = item.Street,
                     City = item.City,
                     State = item.State,
                     PostalCode = item.PostalCode,
