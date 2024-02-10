@@ -86,7 +86,7 @@ namespace Podosys.Worker.Domain.Services
 
                         var addressReport = address != null ? CalculateCustomersAddress(address, firstdate) : null;
 
-                        if (addressReport != null)
+                        if (addressReport != null && addressReport.Any())
                             await _reportRepositoty.AddAddressReportAsync(addressReport);
                     }
                 }
