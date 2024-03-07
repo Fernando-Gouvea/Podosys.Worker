@@ -34,6 +34,8 @@ namespace Podosys.Worker.Domain.Services
             {
                 var transactions = await _podosysRepository.GetTransaction(firstdate);
 
+                var medicalRecords = await _podosysRepository.GetMedicalRecord(firstdate);
+
                 if (transactions.Any())
                 {
                     var profit = CalculateProfit(transactions);
@@ -52,10 +54,8 @@ namespace Podosys.Worker.Domain.Services
                     if (operacionalCost != null)
                         await _reportRepositoty.AddOperacionalCostAsync(operacionalCost);
 
-                    if (transactions.Any(x => x.MedicalRecordId != null))
+                    if (medicalRecords != null)
                     {
-                        var medicalRecords = await _podosysRepository.GetMedicalRecord(transactions.Where(x => x.MedicalRecordId != null).Select(x => (Guid)x.MedicalRecordId));
-
                         var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
 
                         var pacients = await _podosysRepository.GetPacient(medicalRecords.Where(x => x.PacientId != null).Select(x => (Guid)x.PacientId));

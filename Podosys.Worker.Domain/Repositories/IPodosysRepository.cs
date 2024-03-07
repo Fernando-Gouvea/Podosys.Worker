@@ -5,7 +5,7 @@ namespace Podosys.Worker.Domain.Repositories
     public interface IPodosysRepository
     {
         Task<IEnumerable<Transaction>> GetTransaction(DateTime FirstDate);
-        Task<IEnumerable<MedicalRecord>> GetMedicalRecord(IEnumerable<Guid> medicalRecordIds);
+        Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime date);
         Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds);
         Task<IEnumerable<Procedure>> GetProcedure(IEnumerable<Guid> medicalRecordIds);
         Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds);

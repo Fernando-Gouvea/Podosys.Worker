@@ -51,17 +51,17 @@ namespace Podosys.Worker.Persistence.Repositories
             return await db.QueryAsync<TransactionCategory>(sql);
         }
 
-        public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(IEnumerable<Guid> medicalRecordIds)
+        public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime date)
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
             var ids = string.Empty;
 
-            foreach (var medicalRecordId in medicalRecordIds)
-            {
-                ids += ids != string.Empty ? "or" : "";
-                ids += "[Id] ='" + medicalRecordId.ToString() + "'";
-            }
+            //foreach (var medicalRecordId in medicalRecordIds)
+            //{
+            //    ids += ids != string.Empty ? "or" : "";
+            //    ids += "[Id] ='" + medicalRecordId.ToString() + "'";
+            //}
 
             string sql = @"SELECT [Id] 
                                  ,[PacientId]
@@ -72,7 +72,7 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[MedicalRecordDate]
                                  ,[Enabler] 
                              FROM [db_a7ba3c_podosysprd].[dbo].[MedicalRecord_tb] 
-                             Where " + ids;
+                             Where [MedicalRecordDate] >= '" + date.ToString("yyyy-MM-dd") + "'AND [MedicalRecordDate] < '" + date.AddDays(1).ToString("yyyy-MM-dd") + "'";
             try
             {
                 return await db.QueryAsync<MedicalRecord>(sql);
