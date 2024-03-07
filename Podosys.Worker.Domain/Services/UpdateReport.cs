@@ -54,7 +54,7 @@ namespace Podosys.Worker.Domain.Services
                     if (operacionalCost != null)
                         await _reportRepositoty.AddOperacionalCostAsync(operacionalCost);
 
-                    if (medicalRecords != null)
+                    if (medicalRecords.Any())
                     {
                         var professionals = await _podosysRepository.GetProfessional(medicalRecords.Select(x => (Guid)x.UserId).Distinct());
 
