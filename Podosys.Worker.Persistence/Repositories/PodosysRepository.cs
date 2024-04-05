@@ -21,7 +21,7 @@ namespace Podosys.Worker.Persistence.Repositories
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
-            string sql = @"SELECT [Id] 
+            var sql = @"SELECT [Id] 
                                  ,[Description]
                                  ,[FlowType]
                                  ,[PaymentType]
@@ -36,6 +36,40 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[TransactionCategoryId]
                              FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
                              Where [Date] >= '" + FirstDate.ToString("yyyy-MM-dd") + "'AND [Date] < '" + FirstDate.AddDays(1).ToString("yyyy-MM-dd") + "'";
+
+            return await db.QueryAsync<Transaction>(sql);
+        }
+
+        public async Task<IEnumerable<Transaction>> GetTransactionBySaleOffIds(IEnumerable<Guid?>? saleOffIds)
+        {
+            if (saleOffIds is null || !saleOffIds.Any())
+                return null;
+
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var saleoffId in saleOffIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[SaleOffId] ='" + saleoffId.ToString() + "'";
+            }
+
+            var sql = @"SELECT [Id] 
+                                 ,[Description]
+                                 ,[FlowType]
+                                 ,[PaymentType]
+                                 ,[Value]
+                                 ,[Date]
+                                 ,[CashFlowId]
+                                 ,[MedicalRecordId]
+                                 ,[OrderId]
+                                 ,[SaleOffId]
+                                 ,[TransactionTypeId]
+                                 ,[PaymentTypeId]
+                                 ,[TransactionCategoryId]
+                             FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
+                             Where " + ids;
 
             return await db.QueryAsync<Transaction>(sql);
         }
@@ -119,6 +153,39 @@ namespace Podosys.Worker.Persistence.Repositories
                               Where " + ids;
 
             return await db.QueryAsync<Pacient>(sql);
+        }
+
+        public async Task<IEnumerable<SaleOff>> GetSaleOffs(IEnumerable<Guid?>? saleOffIds)
+        {
+            if (saleOffIds is null || !saleOffIds.Any())
+                return null;
+
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var ids = string.Empty;
+
+            foreach (var id in saleOffIds)
+            {
+                if (id is null)
+                    continue;
+
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[Id] ='" + id.ToString() + "'";
+            }
+
+            string sql = @"SELECT [Id] 
+                                  ,[Password]
+                                  ,[BuyerName]
+                                  ,[PhoneNumber]
+                                  ,[NumberOfSection]
+                                  ,[PaymentType]
+                                  ,[Value]
+                                  ,[Date]
+                                  ,[Enabler]
+                              FROM [db_a7ba3c_podosysprd].[dbo].[SaleOff_tb]
+                              Where " + ids;
+
+            return await db.QueryAsync<SaleOff>(sql);
         }
 
         public async Task<IEnumerable<Address>> GetAddress(IEnumerable<Guid?> addressIds)

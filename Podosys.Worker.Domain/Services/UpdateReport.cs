@@ -9,7 +9,7 @@ namespace Podosys.Worker.Domain.Services
     {
         private readonly IPodosysRepository _podosysRepository;
         private readonly IReportRepository _reportRepositoty;
-        private readonly DateTime _updateDate = DateTime.Now.AddHours(5);
+        private readonly DateTime _updateDate = DateTime.Now.AddHours(4);
 
         public UpdateReport(IPodosysRepository podosysRepository,
                             IReportRepository reportRepositoty)
@@ -149,7 +149,7 @@ namespace Podosys.Worker.Domain.Services
             if (!transactions.Where(x => x.SaleOffId != null).Any())
                 return null;
 
-            var saleoffValue = transactions.Where(x => x.SaleOffId != null).Sum(x => x.Value);
+            var saleoffValue = transactions.Where(x => x.SaleOffId != null && !x.PaymentTypeId.Equals(PaymentTypeEnum.Pacote)).Sum(x => x.Value);
 
             return new SaleOffReport
             {
@@ -332,21 +332,49 @@ namespace Podosys.Worker.Domain.Services
             {
                 var medicalRecord = medicalRecords.Where(x => x.UserId == professional.Id);
 
-                var transaction = transactions.Where(t => medicalRecord.Any(x => x.Id == t.MedicalRecordId));
+                var transactionMedical = transactions.Where(t => medicalRecord.Any(x => x.Id == t.MedicalRecordId));
+
+                var value = transactionMedical.Sum(x => x.Value);
+
+                var saleOff = CalculateTransactionProfissional(transactions, medicalRecord).Result;
 
                 profit.Add(new ProfitProfessional
                 {
                     Date = medicalRecord.FirstOrDefault().MedicalRecordDate.Date,
                     Professional = professional.Name,
-                    Value = transaction.Sum(x => x.Value),
+                    Value = value + saleOff.Item1,
+                    SaleOffValue = saleOff.Item1,
+                    SaleOffAmount = saleOff.Item2,
                     ProcedureAmount = medicalRecord.Where(x => medicalRecordBandaid.Item1.Contains(x.Id)).Count(),
                     BandaidAmount = medicalRecord.Where(x => medicalRecordBandaid.Item2.Contains(x.Id)).Count(),
                     UpdateDate = _updateDate,
-                    PendingClosingAmount = CalculatePendingClosing(professional, procedures, medicalRecords, transactions)
                 });
             }
 
             return profit;
+        }
+
+        private async Task<Tuple<decimal, int>> CalculateTransactionProfissional(IEnumerable<Transaction> transactions, IEnumerable<MedicalRecord> medicalRecords)
+        {
+            var amounth = 0m;
+
+            var transactionMedical = transactions.Where(t => medicalRecords.Any(x => x.Id == t.MedicalRecordId));
+
+            var transactionMedSaleoff = transactionMedical.Where(x => x.PaymentTypeId.Equals((int)PaymentTypeEnum.Pacote));
+
+            var transactionBySaleOff = await _podosysRepository.GetTransactionBySaleOffIds(transactionMedSaleoff.Select(x => x.SaleOffId));
+
+            var saleOffs = await _podosysRepository.GetSaleOffs(transactionBySaleOff?.Where(x => !x.PaymentTypeId.Equals((int)PaymentTypeEnum.Pacote))?.Select(x => x.SaleOffId));
+
+            if (saleOffs is not null)
+                foreach (var saleOff in saleOffs)
+                {
+                    amounth += saleOff.NumberOfSection > 0 ?
+                               (transactionBySaleOff.Where(x => x.SaleOffId == saleOff.Id).Sum(x => x.Value) /
+                                saleOff.NumberOfSection) : 0;
+                }
+
+            return new Tuple<decimal, int>(amounth, saleOffs is null ? 0 : saleOffs.Count());
         }
 
         private static int CalculatePendingClosing(Professional professional, IEnumerable<Models.Podosys.Procedure> procedures, IEnumerable<MedicalRecord> medicalRecords, IEnumerable<Transaction> transactions)
