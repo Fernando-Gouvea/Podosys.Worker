@@ -80,9 +80,16 @@ namespace Podosys.Worker.Domain.Services
 
                         await _reportRepositoty.AddAgeGroupReportAsync(AgeReport);
 
-                        var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
+                        try
+                        {
+                            var professionalReport = CalculateProfitProfissional(professionals, procedures, medicalRecords, transactions);
 
-                        await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+                            await _reportRepositoty.AddProfitProfessionalReportAsync(professionalReport);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
 
                         var addressReport = address != null ? CalculateCustomersAddress(address, firstdate) : null;
 
@@ -281,15 +288,20 @@ namespace Podosys.Worker.Domain.Services
             };
         }
 
-        private IEnumerable<Models.Reports.Procedure> CalculateProcedure(IEnumerable<Models.Podosys.Procedure> procedures, IEnumerable<Transaction> transactions)
+        private IEnumerable<Models.Reports.Procedure> CalculateProcedure(IEnumerable<Models.Podosys.Procedure> proceduresList, IEnumerable<Transaction> transactions)
         {
-            var listProcedure = procedures.Select(x => x.ProcedureType).Distinct();
+            var procedures = proceduresList.Where(x => x.ProcedureType is not null);
+
+            var listProcedure = procedures.Where(x => x.ProcedureType is not null).Select(x => x.ProcedureType).Distinct();
 
             var response = new List<Models.Reports.Procedure>();
 
             foreach (var procedure in listProcedure)
             {
-                var medicalRecords = procedures.Where(x => x.ProcedureType.Equals(procedure)).Select(x => x.MedicalRecordId).ToList();
+                var medicalRecords = procedures.Where(x => x.ProcedureType is not null && x.ProcedureType.Equals(procedure)).Select(x => x.MedicalRecordId).ToList();
+
+                if (medicalRecords is null)
+                    continue;
 
                 var value = transactions.Where(x => x.MedicalRecordId != null && medicalRecords.Contains((Guid)x.MedicalRecordId)).Sum(x => x.Value);
 
