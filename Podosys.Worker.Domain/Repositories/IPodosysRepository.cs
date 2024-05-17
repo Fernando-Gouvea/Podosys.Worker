@@ -8,7 +8,7 @@ namespace Podosys.Worker.Domain.Repositories
         Task<IEnumerable<Transaction>> GetTransactionBySaleOffIds(IEnumerable<Guid?>? saleOffIds);
         Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime date);
         Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds);
-        Task<IEnumerable<Procedure>> GetProcedure(IEnumerable<Guid> medicalRecordIds);
+        Task<IEnumerable<Procedure>> GetAllProcedure();
         Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds);
         Task<IEnumerable<SaleOff>> GetSaleOffs(IEnumerable<Guid?>? saleOffIds);
         Task<IEnumerable<Address>> GetAddress(IEnumerable<Guid?> addressIds);

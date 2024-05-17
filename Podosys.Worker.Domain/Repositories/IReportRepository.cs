@@ -7,7 +7,7 @@ namespace Podosys.Worker.Domain.Repositories
         Task AddProfitAsync(Profit profit);
         Task<IEnumerable<Profit>> GetAll();
         Task AddProcedurePerformedAsync(ProcedurePerformed procedurePerformed);
-        Task AddProcedureReportAsync(IEnumerable<Procedure> procedure);
+        Task AddProcedureReportAsync(IEnumerable<ProcedureReport> procedure);
         Task AddRegisterPacientReportAsync(RegisteredPacient registeredPacient);
         Task AddAgeGroupReportAsync(AgeGroup ageGroup);
         Task AddAddressReportAsync(List<AddressReport> addressReport);

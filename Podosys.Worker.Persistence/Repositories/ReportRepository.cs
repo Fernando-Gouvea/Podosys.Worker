@@ -46,7 +46,7 @@ namespace Podosys.Worker.Persistence.Repositories
             _context.SaveChanges();
         }
 
-        public async Task AddProcedureReportAsync(IEnumerable<Procedure> procedure)
+        public async Task AddProcedureReportAsync(IEnumerable<ProcedureReport> procedure)
         {
             var oldReports = await _context.Procedures
                             .Where(x => x.Date.Date == procedure.FirstOrDefault().Date.Date)

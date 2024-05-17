@@ -2,6 +2,6 @@
 {
     public enum ProcedureEnum
     {
-        Curativo = 1,
+        CURATIVO = 17,
     }
 }

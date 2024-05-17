@@ -12,7 +12,7 @@ namespace Podosys.Worker.Persistence.Context
         }
 
         public DbSet<AgeGroup> AgeGroups { get; set; }
-        public DbSet<Procedure> Procedures { get; set; }
+        public DbSet<ProcedureReport> Procedures { get; set; }
         public DbSet<Profit> Profit { get; set; }
         public DbSet<ProcedurePerformed> ProcedurePerformed { get; set; }
         public DbSet<ProfitProfessional> ProfitProfessional { get; set; }

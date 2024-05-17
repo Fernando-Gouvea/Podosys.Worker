@@ -3,9 +3,8 @@
     public class Procedure
     {
         public int Id { get; set; }
-
-        public string? ProcedureType { get; set; }
-
-        public Guid MedicalRecordId { get; set; }
+        public string? Name { get; set; }
+        public string? Observation { get; set; }
+        public int? GroupId { get; set; }
     }
 }

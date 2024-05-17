@@ -2,7 +2,7 @@
 
 namespace Podosys.Worker.Domain.Models.Reports
 {
-    public class Procedure
+    public class ProcedureReport
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
