@@ -2,6 +2,7 @@
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Models.Reports;
 using Podosys.Worker.Domain.Repositories;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Podosys.Worker.Domain.Services
 {
@@ -32,6 +33,14 @@ namespace Podosys.Worker.Domain.Services
             //lastdate = DateTime.Parse("02-11-2023");
 
             _procedures = await _podosysRepository.GetAllProcedure();
+
+            var date = firstdate;
+
+            for (var count = 0; date <= lastdate; date = date.AddMonths(1))
+            {
+                var annualComparison = await CalculateAnnualComparisonReport(date);
+                await _reportRepositoty.AddAnnualComparisonReportAsync(annualComparison);
+            }
 
             for (var count = 0; firstdate <= lastdate; firstdate = firstdate.AddDays(1))
             {
@@ -148,6 +157,27 @@ namespace Podosys.Worker.Domain.Services
                 OperationalCost = operecionalCost.Sum(x => x.Value),
                 AccountBalance = currentAccountValue - operecionalCost.Where(x => x.PaymentTypeId != (int)PaymentTypeEnum.Dinheiro).Sum(x => x.Value),
                 WorkingDays = WorkingDays(transactions.FirstOrDefault().Date.Date),
+                UpdateDate = _updateDate
+            };
+        }
+
+        private async Task<AnnualComparisonReport> CalculateAnnualComparisonReport(DateTime date)
+        {
+            var profitValue = await _podosysRepository.GetTransactionMonth(date);
+
+            var profitLastYearValue = await _podosysRepository.GetTransactionMonth(date.AddYears(-1));
+
+            var operecionalCost = await _podosysRepository.GetTransactionMonth(date, operacionalCost: true);
+
+            var operecionalCostLastYear = await _podosysRepository.GetTransactionMonth(date.AddYears(-1), operacionalCost: true);
+
+            return new AnnualComparisonReport
+            {
+                Date = new DateTime(date.Year, date.Month, 1),
+                TotalValue = profitValue.Sum(x => x.Value),
+                TotalValueLastYear = profitLastYearValue.Sum(x => x.Value),
+                TotalCostValue = operecionalCost.Sum(x => x.Value),
+                TotalCostValueLastYear = operecionalCostLastYear.Sum(x => x.Value),
                 UpdateDate = _updateDate
             };
         }

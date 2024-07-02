@@ -15,5 +15,6 @@ namespace Podosys.Worker.Domain.Repositories
         Task AddCommunicationChannelReportAsync(IEnumerable<CommunicationChannel> channels);
         Task AddOperacionalCostAsync(List<OperationalCostReport> operacionalCost);
         Task AddSaleOffAsync(SaleOffReport saleoff);
+        Task AddAnnualComparisonReportAsync(AnnualComparisonReport report);
     }
 }

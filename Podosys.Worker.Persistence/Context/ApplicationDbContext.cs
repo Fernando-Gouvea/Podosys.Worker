@@ -19,6 +19,7 @@ namespace Podosys.Worker.Persistence.Context
         public DbSet<RegisteredPacient> RegisteredPacients { get; set; }
         public DbSet<CommunicationChannel> CommunicationChannels { get; set; }
         public DbSet<SaleOffReport> SaleOffReport { get; set; }
+        public DbSet<AnnualComparisonReport> AnnualComparisonReport { get; set; }
         public DbSet<OperationalCostReport> OperationalCostReport { get; set; }
         public DbSet<AddressReport> AddressReport { get; set; }
 

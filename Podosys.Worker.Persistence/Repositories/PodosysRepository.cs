@@ -40,6 +40,54 @@ namespace Podosys.Worker.Persistence.Repositories
             return await db.QueryAsync<Transaction>(sql);
         }
 
+        public async Task<IEnumerable<Transaction>> GetTransactionMonth(DateTime date, bool operacionalCost = false)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            date = new DateTime(date.Year, date.Month, 1);
+
+            var ultimoDiaMes = date.AddMonths(1);
+
+            var sql = !operacionalCost ?
+                                  @"SELECT [Id] 
+                                 ,[Description]
+                                 ,[FlowType]
+                                 ,[PaymentType]
+                                 ,[Value]
+                                 ,[Date]
+                                 ,[CashFlowId]
+                                 ,[MedicalRecordId]
+                                 ,[OrderId]
+                                 ,[SaleOffId]
+                                 ,[TransactionTypeId]
+                                 ,[PaymentTypeId]
+                                 ,[TransactionCategoryId]
+                             FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
+                             Where [Date] >= '" + date.ToString("yyyy-MM-dd") + "'AND [Date] < '" + ultimoDiaMes.ToString("yyyy-MM-dd") + "'" +
+                                     "and (MedicalRecordId is not null " +
+                                     "or OrderId is not null " +
+                                     "or SaleOffId is not null)" :
+
+                             @"SELECT [Id] 
+                                 ,[Description]
+                                 ,[FlowType]
+                                 ,[PaymentType]
+                                 ,[Value]
+                                 ,[Date]
+                                 ,[CashFlowId]
+                                 ,[MedicalRecordId]
+                                 ,[OrderId]
+                                 ,[SaleOffId]
+                                 ,[TransactionTypeId]
+                                 ,[PaymentTypeId]
+                                 ,[TransactionCategoryId]
+                             FROM [db_a7ba3c_podosysprd].[dbo].[Transaction_tb]
+                             Where [Date] >= '" + date.ToString("yyyy-MM-dd") + "'AND [Date] < '" + ultimoDiaMes.ToString("yyyy-MM-dd") + "'" +
+                                     "and [TransactionTypeId] = 2";
+
+            return await db.QueryAsync<Transaction>(sql);
+        }
+
         public async Task<IEnumerable<Transaction>> GetTransactionBySaleOffIds(IEnumerable<Guid?>? saleOffIds)
         {
             if (saleOffIds is null || !saleOffIds.Any() || saleOffIds.Any(x => x == null))
@@ -85,13 +133,22 @@ namespace Podosys.Worker.Persistence.Repositories
             return await db.QueryAsync<TransactionCategory>(sql);
         }
 
-        public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime date)
+        public async Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime date, IEnumerable<Guid?> medicalRecordIds = null)
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
             var ids = string.Empty;
 
-            string sql = @"SELECT [Id] 
+            if (medicalRecordIds != null)
+                foreach (var id in medicalRecordIds)
+                {
+                    ids += ids != string.Empty ? " or " : "";
+                    ids += "[Id] ='" + id.ToString() + "'";
+                }
+
+
+            string sql = string.IsNullOrEmpty(ids) ?
+                             @"SELECT [Id] 
                                  ,[PacientId]
                                  ,[UserId]
                                  ,[PayType]
@@ -102,7 +159,20 @@ namespace Podosys.Worker.Persistence.Repositories
                                  ,[HomeCare]
                                  ,[Enabler] 
                              FROM [db_a7ba3c_podosysprd].[dbo].[MedicalRecord_tb] 
-                             Where [MedicalRecordDate] >= '" + date.ToString("yyyy-MM-dd") + "'AND [MedicalRecordDate] < '" + date.AddDays(1).ToString("yyyy-MM-dd") + "'";
+                             Where [MedicalRecordDate] >= '" + date.ToString("yyyy-MM-dd") + "'AND [MedicalRecordDate] < '" + date.AddDays(1).ToString("yyyy-MM-dd") + "'"
+                            :
+                             @"SELECT [Id] 
+                                 ,[PacientId]
+                                 ,[UserId]
+                                 ,[PayType]
+                                 ,[Value]
+                                 ,[Observation]
+                                 ,[MedicalRecordDate]
+                                 ,[ProcedurePriceId]
+                                 ,[HomeCare]
+                                 ,[Enabler] 
+                             FROM [db_a7ba3c_podosysprd].[dbo].[MedicalRecord_tb] 
+                             Where" + ids;
             try
             {
                 return await db.QueryAsync<MedicalRecord>(sql);
