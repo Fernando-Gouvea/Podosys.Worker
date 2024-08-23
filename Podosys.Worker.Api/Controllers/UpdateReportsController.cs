@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Podosys.Worker.Domain.Services;
+using Podosys.Worker.Domain.Services.Update;
 
 namespace Podosys.Worker.Api.Controllers
 {

@@ -172,5 +172,19 @@ namespace Podosys.Worker.Persistence.Repositories
 
             _context.SaveChanges();
         }
+
+        public async Task AddProcedurePriceReportAsync(IEnumerable<ProcedurePriceReport> report)
+        {
+            //var oldReports = await _context.ProcedurePriceReport
+            //                .Where(x => x.Date.Date == report.Date.Date)
+            //                .ToListAsync();
+
+            //if (oldReports.Any())
+            //    _context.AnnualComparisonReport.RemoveRange(oldReports);
+
+            //await _context.AnnualComparisonReport.AddAsync(report);
+
+            //_context.SaveChanges();
+        }
     }
 }

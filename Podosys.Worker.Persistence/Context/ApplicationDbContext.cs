@@ -11,17 +11,18 @@ namespace Podosys.Worker.Persistence.Context
         {
         }
 
+        public DbSet<Profit> Profit { get; set; }
         public DbSet<AgeGroup> AgeGroups { get; set; }
         public DbSet<ProcedureReport> Procedures { get; set; }
-        public DbSet<Profit> Profit { get; set; }
+        public DbSet<SaleOffReport> SaleOffReport { get; set; }
+        public DbSet<AddressReport> AddressReport { get; set; }
+        public DbSet<RegisteredPacient> RegisteredPacients { get; set; }
         public DbSet<ProcedurePerformed> ProcedurePerformed { get; set; }
         public DbSet<ProfitProfessional> ProfitProfessional { get; set; }
-        public DbSet<RegisteredPacient> RegisteredPacients { get; set; }
+        public DbSet<ProcedurePriceReport> ProcedurePriceReport { get; set; }
         public DbSet<CommunicationChannel> CommunicationChannels { get; set; }
-        public DbSet<SaleOffReport> SaleOffReport { get; set; }
-        public DbSet<AnnualComparisonReport> AnnualComparisonReport { get; set; }
         public DbSet<OperationalCostReport> OperationalCostReport { get; set; }
-        public DbSet<AddressReport> AddressReport { get; set; }
+        public DbSet<AnnualComparisonReport> AnnualComparisonReport { get; set; }
 
         public int SaveChangesAsync()
         {

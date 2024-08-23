@@ -1,5 +1,5 @@
 ﻿using Podosys.Worker.Api.Extensions;
-using Podosys.Worker.Domain.Services;
+using Podosys.Worker.Domain.Services.Update;
 
 namespace Podosys.Worker.Api.Workers
 {

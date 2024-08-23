@@ -10,11 +10,13 @@ namespace Podosys.Worker.Domain.Repositories
         Task<IEnumerable<MedicalRecord>> GetMedicalRecord(DateTime date, IEnumerable<Guid?> medicalRecordIds = null);
         Task<IEnumerable<Pacient>> GetPacient(IEnumerable<Guid> pacientIds);
         Task<IEnumerable<Procedure>> GetAllProcedure();
-        Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds);
+        Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid?> professionalIds);
         Task<IEnumerable<SaleOff>> GetSaleOffs(IEnumerable<Guid?>? saleOffIds);
         Task<IEnumerable<Address>> GetAddress(IEnumerable<Guid?> addressIds);
         Task<IEnumerable<PodosysCommunicationChannel>> GetAllCommunicationChannel();
         Task<IEnumerable<Pacient>> GetPacientByDate(DateTime date);
         Task<IEnumerable<TransactionCategory>> GetAllTransactionCategory();
+        Task<IEnumerable<ProcedurePrices>> GetProcedurePrices();
+        Task<IEnumerable<Feedback>> GetFeedback(DateTime date);
     }
 }

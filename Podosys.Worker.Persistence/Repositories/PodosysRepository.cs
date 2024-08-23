@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Repositories;
+using System;
 
 namespace Podosys.Worker.Persistence.Repositories
 {
@@ -330,7 +331,7 @@ namespace Podosys.Worker.Persistence.Repositories
             return await db.QueryAsync<Procedure>(sql);
         }
 
-        public async Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid> professionalIds)
+        public async Task<IEnumerable<Professional>> GetProfessional(IEnumerable<Guid?> professionalIds)
         {
             await using var db = new SqlConnection(_podosysConnectionString);
 
@@ -359,6 +360,96 @@ namespace Podosys.Worker.Persistence.Repositories
                                   FROM [db_a7ba3c_podosysprd].[dbo].[CommunicationChannel_tb]";
 
             return await db.QueryAsync<PodosysCommunicationChannel>(sql);
+        }
+
+        public async Task<IEnumerable<ProcedurePrices>> GetProcedurePrices()
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            string sql = @"SELECT [Id]
+                              ,[Name]
+                              ,[Observation]
+                              ,[GroupId]
+                          FROM [db_a7ba3c_podosysprd].[dbo].[ProcedurePrices_tb]";
+
+            var procedurePrices = await db.QueryAsync<ProcedurePrices>(sql);
+
+            procedurePrices = await GetProcedurePricesValues(procedurePrices);
+
+            return procedurePrices;
+        }
+
+        private async Task<IEnumerable<ProcedurePrices>> GetProcedurePricesValues(IEnumerable<ProcedurePrices> procedurePrices)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            foreach (var item in procedurePrices)
+            {
+                string sql = $@"SELECT [Id]
+                              ,[PriceMin]
+                              ,[PriceMax]
+                              ,[Date]
+                              ,[ProcedurePricesId]
+                              ,[ChildProcedure]
+                              ,[Enabler]
+                              ,[SaleOff]
+                              ,[Sessions]
+                              ,[Observation]
+                          FROM [db_a7ba3c_podosysprd].[dbo].[ProcedurePricesValues_tb]
+                          where [ProcedurePricesId] = {item.Id}";
+
+                var procedurePricesValues = await db.QueryAsync<ProcedurePricesValues>(sql);
+
+                item.ProcedurePricesValues.AddRange(procedurePricesValues);
+            }
+
+            return procedurePrices;
+        }
+
+        public async Task<IEnumerable<Feedback>> GetFeedback(DateTime date)
+        {
+            await using var db = new SqlConnection(_podosysConnectionString);
+
+            var lastDay = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+
+            string sql = @$"SELECT [Id]
+                                 ,[UserId]
+                                 ,[CriticismId]
+                                 ,[CriticismDetails]
+                                 ,[UserGrade]
+                                 ,[Date]
+                          FROM [db_a7ba3c_podosysprd].[dbo].[Feedback_tb]
+                          where [Date] >= '{date.ToString("yyyy-MM-01")}' and [Date] < '{lastDay.ToString("yyyy-MM-dd")}'";
+
+            var feedbacks = await db.QueryAsync<Feedback>(sql);
+
+            var criticismIds = feedbacks.Select(x => x.CriticismId).Distinct();
+
+            var ids = string.Empty;
+
+            foreach (var item in criticismIds)
+            {
+                ids += ids != string.Empty ? "or" : "";
+                ids += "[Id] ='" + item.ToString() + "'";
+            }
+
+            sql = @$"SELECT [Id]
+                           ,[Type]
+                     FROM [db_a7ba3c_podosysprd].[dbo].[Criticism_tb]
+                     Where " + ids;
+
+            var criticisms = await db.QueryAsync<Criticism>(sql);
+
+            var users = await GetProfessional(feedbacks.Select(x => x.UserId).Distinct());
+
+            foreach (var item in feedbacks)
+            {
+                item.Criticism = criticisms.FirstOrDefault(x => x.Id == item.CriticismId);
+
+                item.User = users.FirstOrDefault(x => x.Id == item.UserId);
+            }
+
+            return feedbacks;
         }
     }
 }

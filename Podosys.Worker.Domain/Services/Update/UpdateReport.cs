@@ -2,9 +2,8 @@
 using Podosys.Worker.Domain.Models.Podosys;
 using Podosys.Worker.Domain.Models.Reports;
 using Podosys.Worker.Domain.Repositories;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Podosys.Worker.Domain.Services
+namespace Podosys.Worker.Domain.Services.Update
 {
     public class UpdateReport : IUpdateReport
     {
@@ -337,7 +336,7 @@ namespace Podosys.Worker.Domain.Services
 
             if (response.Count == 0)
             {
-                var report = new Models.Reports.ProcedureReport
+                var report = new ProcedureReport
                 {
                     Date = transactions.FirstOrDefault().Date.Date,
                     Amounth = 1,
@@ -400,8 +399,8 @@ namespace Podosys.Worker.Domain.Services
                 foreach (var saleOff in saleOffs)
                 {
                     amounth += saleOff.NumberOfSection > 0 ?
-                               (transactionBySaleOff.Where(x => x.SaleOffId == saleOff.Id).Sum(x => x.Value) /
-                                saleOff.NumberOfSection) : 0;
+                               transactionBySaleOff.Where(x => x.SaleOffId == saleOff.Id).Sum(x => x.Value) /
+                                saleOff.NumberOfSection : 0;
                 }
 
             return new Tuple<decimal, int>(amounth, saleOffs is null ? 0 : saleOffs.Count());

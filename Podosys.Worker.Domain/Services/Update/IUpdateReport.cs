@@ -1,4 +1,4 @@
-﻿namespace Podosys.Worker.Domain.Services
+﻿namespace Podosys.Worker.Domain.Services.Update
 {
     public interface IUpdateReport
     {
