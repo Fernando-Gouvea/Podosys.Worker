@@ -1,7 +1,7 @@
 ﻿using MassTransit;
-using MassTransit.Metadata;
+using Podosys.Worker.Domain.Models.Podosys;
+using Podosys.Worker.Domain.Services;
 using PodoSys.Services.ServiceModels;
-using System.Diagnostics;
 
 namespace Podosys.Worker.Api.Queues
 {
@@ -9,7 +9,7 @@ namespace Podosys.Worker.Api.Queues
     {
         public async Task Consume(ConsumeContext<WhatsappSendMessageModel> context)
         {
-           
+           // await _sendMessage.SendMessageAsync(context.Message.Number, context.Message.Message);
         }
     }
 

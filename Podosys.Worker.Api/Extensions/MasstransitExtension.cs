@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Sample.Masstransit.WebApi.Core.Extensions;
+namespace Podosys.Worker.Api.Extensions;
 
 public static class MasstransitExtension
 {

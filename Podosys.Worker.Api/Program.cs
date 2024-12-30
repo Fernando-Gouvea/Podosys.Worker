@@ -6,6 +6,8 @@ using Podosys.Worker.Api.Queues;
 using Podosys.Worker.Api.Workers;
 using Podosys.Worker.Domain.Repositories;
 using Podosys.Worker.Domain.Services;
+using Podosys.Worker.Infrastructure.Integrations.Interfaces.ApiBrasil.WhatsAppBaileys;
+using Podosys.Worker.Infrastructure.Integrations.ServiceHandler.ApiBrasil.WhatsAppBaileys;
 using Podosys.Worker.Persistence.Context;
 using Podosys.Worker.Persistence.Repositories;
 
@@ -19,6 +21,8 @@ var timeZoneBrasilia = TimeZoneInfo.FindSystemTimeZoneById("E. South America Sta
 builder.Services.AddTransient<IReportRepository, ReportRepository>();
 builder.Services.AddTransient<IPodosysRepository, PodosysRepository>();
 builder.Services.AddTransient<IUpdateReport, UpdateReport>();
+builder.Services.AddTransient<IWhatsAppBaileysServiceHandler, WhatsAppBaileysServiceHandler>();
+builder.Services.AddTransient<ISendMessage, SendMessage>();
 
 builder.Services.AddCronJob<TimerUpdateReportLastDay>(c => { c.CronExpression = "0 6 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
 builder.Services.AddCronJob<TimerUpdateReportCurrentDay>(c => { c.CronExpression = "0 10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * *"; c.TimeZoneInfo = timeZoneBrasilia; });
@@ -29,7 +33,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure(x =>x);
+var configuration = builder.Configuration;
 
 builder.Services.AddMassTransit(x =>
 {
@@ -40,7 +44,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host(Configuration.GetConnectionString("RabbitMq"));
+        cfg.Host(configuration.GetConnectionString("RabbitMq"));
         cfg.UseDelayedMessageScheduler();
         cfg.ServiceInstance(instance =>
         {
