@@ -49,7 +49,7 @@ builder.Services.AddMassTransit(x =>
         cfg.ServiceInstance(instance =>
         {
             instance.ConfigureJobServiceEndpoints();
-            instance.ConfigureEndpoints(ctx, new KebabCaseEndpointNameFormatter("dev", false));
+            instance.ConfigureEndpoints(ctx, new KebabCaseEndpointNameFormatter("prod", false));
 
         });
     });
