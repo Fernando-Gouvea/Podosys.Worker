@@ -1,7 +1,5 @@
 ﻿using Podosys.Worker.Infrastructure.Integrations.Interfaces.ApiBrasil.WhatsAppBaileys;
 using Podosys.Worker.Infrastructure.Integrations.Services.ApiBrasil.WhatsAppBaileys;
-using System;
-using System.Threading.Tasks;
 
 namespace Podosys.Worker.Domain.Services
 {
@@ -11,7 +9,7 @@ namespace Podosys.Worker.Domain.Services
 
         public SendMessage(IWhatsAppBaileysServiceHandler whatsAppBaileysServiceHandler)
         {
-            _whatsAppBaileysService = whatsAppBaileysServiceHandler;    
+            _whatsAppBaileysService = whatsAppBaileysServiceHandler;
         }
 
         public async Task SendMessageAsync(string number, string message)
