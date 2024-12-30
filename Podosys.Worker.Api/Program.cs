@@ -29,7 +29,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure(x =>x);
+var configuration = builder.Configuration;
 
 builder.Services.AddMassTransit(x =>
 {
@@ -40,7 +40,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((ctx, cfg) =>
     {
-        cfg.Host(Configuration.GetConnectionString("RabbitMq"));
+        cfg.Host(configuration.GetConnectionString("RabbitMq"));
         cfg.UseDelayedMessageScheduler();
         cfg.ServiceInstance(instance =>
         {
